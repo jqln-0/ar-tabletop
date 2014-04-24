@@ -1,5 +1,5 @@
 
-.PHONY: default clean test configure build ar-tabletop
+.PHONY: default clean test configure build ar-tabletop format
 
 default: ar-tabletop
 
@@ -16,5 +16,8 @@ configure:
 build: configure
 	cd build; \
 		make
+
+format:
+	clang-format -style=Google -i src/*.cpp src/*.h
 
 ar-tabletop: configure build
