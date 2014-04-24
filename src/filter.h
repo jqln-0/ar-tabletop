@@ -16,10 +16,10 @@ class MarkerFilter {
 
 class BoardIgnoringMarkerFilter : public MarkerFilter {
  protected:
-	std::unordered_set<int> board_markers_;
+  std::unordered_set<int> board_markers_;
 
  public:
-  BoardIgnoringMarkerFilter(const aruco::BoardConfiguration& config);
+  BoardIgnoringMarkerFilter(const aruco::BoardConfiguration &config);
 
   virtual void Filter(std::vector<aruco::Marker> *m);
 };
@@ -27,7 +27,7 @@ class BoardIgnoringMarkerFilter : public MarkerFilter {
 class SmoothingMarkerFilter : public MarkerFilter {
  protected:
   const int memory_length_;
-	std::unordered_map<int, pair<aruco::Marker, int>> markers_;
+  std::unordered_map<int, pair<aruco::Marker, int>> markers_;
 
  public:
   SmoothingMarkerFilter(int memory_length = 2);
