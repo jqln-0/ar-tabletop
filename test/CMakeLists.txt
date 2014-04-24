@@ -6,6 +6,7 @@ include_directories( ${CMAKE_SOURCE_DIR}/src )
 # List of test files to include.
 set( TESTS
   BoardIgnoringMarkerFilterTest.cpp
+  SmoothingMarkerFilterTest.cpp
 )
 
 add_executable( AllTests
