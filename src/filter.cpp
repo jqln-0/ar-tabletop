@@ -1,36 +1,31 @@
-#ifndef __FILTER_H_
-#define __FILTER_H_
+#include "filter.h"
 
-#include <vector>
-#include <utility>
-#include <aruco/aruco.h>
+// BoardIgnoringMarkerFilter
 
-class MarkerFilter {
- public:
-  virtual ~MarkerFilter() {}
+BoardIgnoringMarkerFilter::BoardIgnoringMarkerFilter(
+    const aruco::BoardConfiguration& config) {
+	// Create a hashset from the board markers for faster lookup later.
+	std::vector<int> ids;
+	config.getIdList(ids, false);
+	for (std::vector<int>::iterator it=ids.begin(); it != ids.end(); ++it) {
+		board_markers_.insert(*it);
+	}
+}
 
-  virtual void Filter(std::vector<aruco::Marker>* m) = 0;
-};
+void BoardIgnoringMarkerFilter::Filter(std::vector<aruco::Marker> *m) {
+	// Iterate backwards so we can remove ids as we go.
+	for (std::vector<aruco::Marker>::reverse_iterator it = m->rbegin(); it != m->rend(); ++it) {
+		if (board_markers_.find(it->id) != board_markers_.end()) {
+			m->erase( --(it.base()) );
+		}
+	}
+}
 
-class BoardIgnoringMarkerFilter : public MarkerFilter {
- protected:
-  const aruco::BoardConfiguration& config_;
+// SmoothingMarkerFilter
 
- public:
-  BoardIgnoringMarkerFilter(const aruco::BoardConfiguration& config);
+SmoothingMarkerFilter::SmoothingMarkerFilter(int memory_length)
+    : memory_length_(memory_length) {}
 
-  virtual void Filter(std::vector<aruco::Marker> m);
-};
-
-class SmoothingMarkerFilter : public MarkerFilter {
- protected:
-  const int memory_length_;
-  std::vector<std::pair<int, int>> markers_;
-
- public:
-  SmoothingMarkerFilter(int memory_length = 2);
-
-  virtual void Filter(std::vector<aruco::Marker> m);
-};
-
-#endif  // __FILTER_H_
+void SmoothingMarkerFilter::Filter(std::vector<aruco::Marker> *m) {
+	// TODO.
+}

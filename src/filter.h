@@ -1,20 +1,38 @@
-#include "filter.h"
+#ifndef __FILTER_H_
+#define __FILTER_H_
 
-// BoardIgnoringMarkerFilter
+#include <unordered_set>
+#include <unordered_map>
+#include <vector>
+#include <utility>
+#include <aruco/aruco.h>
 
-BoardIgnoringMarkerFilter::BoardIgnoringMarkerFilter(
-    const aruco::BoardConfiguration& config)
-    : config_(config) {}
+class MarkerFilter {
+ public:
+  virtual ~MarkerFilter() {}
 
-void BoardIgnoringMarkerFilter::Filter(std::vector<aruco::Marker>> m) {
-  // TODO.
-}
+  virtual void Filter(std::vector<aruco::Marker> *m) = 0;
+};
 
-// SmoothingMarkerFilter
+class BoardIgnoringMarkerFilter : public MarkerFilter {
+ protected:
+	std::unordered_set<int> board_markers_;
 
-SmoothingMarkerFilter::SmoothingMarkerFilter(int memory_length)
-    : memory_length_(memory_length) {}
+ public:
+  BoardIgnoringMarkerFilter(const aruco::BoardConfiguration& config);
 
-void SmoothingMarkerFilter::Filter(std::vector<aruco::Marker>> m) {
-  // TODO.
-}
+  virtual void Filter(std::vector<aruco::Marker> *m);
+};
+
+class SmoothingMarkerFilter : public MarkerFilter {
+ protected:
+  const int memory_length_;
+	std::unordered_map<int, pair<aruco::Marker, int>> markers_;
+
+ public:
+  SmoothingMarkerFilter(int memory_length = 2);
+
+  virtual void Filter(std::vector<aruco::Marker> *m);
+};
+
+#endif  // __FILTER_H_
