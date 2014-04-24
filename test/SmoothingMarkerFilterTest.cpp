@@ -5,56 +5,54 @@
 
 #include "filter.h"
 
-class SmoothingMarkerFilterTest : public ::testing::Test
-{
-protected:
-		void AddMarkerToVector(int id) {
-			aruco::Marker marker;
-			marker.id = id;
-			markers_.push_back(marker);
-		}
+class SmoothingMarkerFilterTest : public ::testing::Test {
+ protected:
+  void AddMarkerToVector(int id) {
+    aruco::Marker marker;
+    marker.id = id;
+    markers_.push_back(marker);
+  }
 
-		std::vector<aruco::Marker> markers_;
+  std::vector<aruco::Marker> markers_;
 };
 
 TEST_F(SmoothingMarkerFilterTest, RemembersMarker) {
-	SmoothingMarkerFilter filter(1);
+  SmoothingMarkerFilter filter(1);
 
-	AddMarkerToVector(0);
-	filter.Filter(&markers_);
+  AddMarkerToVector(0);
+  filter.Filter(&markers_);
 
-	// First filter should not touch the markers.
-	ASSERT_EQ(1, markers_.size());
-	ASSERT_EQ(0, markers_[0].id);
+  // First filter should not touch the markers.
+  ASSERT_EQ(1, markers_.size());
+  ASSERT_EQ(0, markers_[0].id);
 
-	markers_.clear();
-	ASSERT_EQ(0, markers_.size());
-	filter.Filter(&markers_);
+  markers_.clear();
+  ASSERT_EQ(0, markers_.size());
+  filter.Filter(&markers_);
 
-	// Second filter should add the missing marker.
-	ASSERT_EQ(1, markers_.size());
-	ASSERT_EQ(0, markers_[0].id);
+  // Second filter should add the missing marker.
+  ASSERT_EQ(1, markers_.size());
+  ASSERT_EQ(0, markers_[0].id);
 }
 
 TEST_F(SmoothingMarkerFilterTest, ForgetsMarker) {
-	SmoothingMarkerFilter filter(1);
+  SmoothingMarkerFilter filter(1);
 
-	AddMarkerToVector(0);
-	filter.Filter(&markers_);
+  AddMarkerToVector(0);
+  filter.Filter(&markers_);
 
-	// First filter should not touch the markers.
-	ASSERT_EQ(1, markers_.size());
-	ASSERT_EQ(0, markers_[0].id);
+  // First filter should not touch the markers.
+  ASSERT_EQ(1, markers_.size());
+  ASSERT_EQ(0, markers_[0].id);
 
-	markers_.clear();
-	ASSERT_EQ(0, markers_.size());
-	filter.Filter(&markers_);
+  markers_.clear();
+  ASSERT_EQ(0, markers_.size());
+  filter.Filter(&markers_);
 
-	markers_.clear();
-	ASSERT_EQ(0, markers_.size());
-	filter.Filter(&markers_);
+  markers_.clear();
+  ASSERT_EQ(0, markers_.size());
+  filter.Filter(&markers_);
 
-	// Third filter should have forgotten the marker.
-	ASSERT_EQ(0, markers_.size());
+  // Third filter should have forgotten the marker.
+  ASSERT_EQ(0, markers_.size());
 }
-

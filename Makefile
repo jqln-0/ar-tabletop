@@ -18,6 +18,6 @@ build: configure
 		make
 
 format:
-	clang-format -style=Google -i src/*.cpp src/*.h
+	clang-format -style=Google -i src/*.cpp src/*.h test/*.cpp
 
 ar-tabletop: configure build
