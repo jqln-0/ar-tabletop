@@ -9,7 +9,7 @@ class FrameFetcher {
   virtual ~FrameFetcher() {};
 
   virtual std::unique_ptr<cv::Mat> next_frame() = 0;
-  virtual bool has_next_frame() = 0;
+  virtual bool has_next_frame() const = 0;
 };
 
 class WebcamFrameFetcher : public FrameFetcher {
@@ -17,11 +17,11 @@ class WebcamFrameFetcher : public FrameFetcher {
   cv::VideoCapture *video_capturer_;
 
  public:
-  WebcamFrameFetcher(int device_index = 0);
+  WebcamFrameFetcher(const int device_index = 0);
   ~WebcamFrameFetcher();
 
   virtual std::unique_ptr<cv::Mat> next_frame();
-  virtual bool has_next_frame();
+  virtual bool has_next_frame() const;
 };
 
 class VideoFrameFetcher : public FrameFetcher {
@@ -33,7 +33,7 @@ class VideoFrameFetcher : public FrameFetcher {
   ~VideoFrameFetcher();
 
   virtual std::unique_ptr<cv::Mat> next_frame();
-  virtual bool has_next_frame();
+  virtual bool has_next_frame() const;
 };
 
 class PhotoFrameFetcher : public FrameFetcher {
@@ -45,7 +45,7 @@ class PhotoFrameFetcher : public FrameFetcher {
   ~PhotoFrameFetcher();
 
   virtual std::unique_ptr<cv::Mat> next_frame();
-  virtual bool has_next_frame();
+  virtual bool has_next_frame() const;
 };
 
 #endif  // __FRAMEFETCHER_H_

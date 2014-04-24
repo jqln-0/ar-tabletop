@@ -26,7 +26,7 @@ std::unique_ptr<cv::Mat> WebcamFrameFetcher::next_frame() {
   return frame;
 }
 
-bool WebcamFrameFetcher::has_next_frame() {
+bool WebcamFrameFetcher::has_next_frame() const {
   // cv::VideoCapture will close on EOF, so this will reliably work.
   return video_capturer_->isOpened();
 }
@@ -57,7 +57,7 @@ std::unique_ptr<cv::Mat> VideoFrameFetcher::next_frame() {
   return frame;
 }
 
-bool VideoFrameFetcher::has_next_frame() {
+bool VideoFrameFetcher::has_next_frame() const {
   // cv::VideoCapture will close on EOF, so this will reliably work.
   return video_capturer_->isOpened();
 }
@@ -77,7 +77,7 @@ std::unique_ptr<cv::Mat> PhotoFrameFetcher::next_frame() {
   return unique_ptr<cv::Mat>(frame);
 }
 
-bool PhotoFrameFetcher::has_next_frame() {
+bool PhotoFrameFetcher::has_next_frame() const {
   // Essentially this checks whether or not openning the image was successful.
   return image_->data == NULL;
 }

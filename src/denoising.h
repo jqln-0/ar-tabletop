@@ -15,7 +15,7 @@ class DenoisingFrameFetcher : public FrameFetcher {
   virtual ~DenoisingFrameFetcher();
 
   virtual std::unique_ptr<cv::Mat> next_frame() = 0;
-  virtual bool has_next_frame();
+  virtual bool has_next_frame() const;
 
   virtual FrameFetcher *wrapped() { return wrapped_; }
 };

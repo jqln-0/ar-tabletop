@@ -6,7 +6,7 @@ DenoisingFrameFetcher::DenoisingFrameFetcher(FrameFetcher *w) : wrapped_(w) {}
 
 DenoisingFrameFetcher::~DenoisingFrameFetcher() {}
 
-bool DenoisingFrameFetcher::has_next_frame() {
+bool DenoisingFrameFetcher::has_next_frame() const {
   return wrapped_->has_next_frame();
 }
 
