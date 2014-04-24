@@ -8,6 +8,8 @@
 #include <aruco/aruco.h>
 
 #include "framefetcher.h"
+#include "denoising.h"
+#include "matconv.h"
 
 namespace Ui {
 class MainWindow;

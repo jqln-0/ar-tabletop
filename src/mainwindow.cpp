@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
   ui->setupUi(this);
 
   // Create the fetcher.
-  frames_ = new WebcamFrameFetcher();
+  frames_ = new MedianDenoisingFrameFetcher(new WebcamFrameFetcher(), 11);
 
   // Create the timer.
   frame_timer_ = new QTimer(this);
@@ -19,24 +19,16 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::processFrame() {
-  /*
-  QGraphicsScene *scene = new(QGraphicsScene);
+  QGraphicsScene *scene = new (QGraphicsScene);
 
-  // Get the mat and convert to rgb.
-  cv::Mat original = frames_->next_frame();
-  cv::Mat converted;
-  cv::cvtColor(original, converted, cv::COLOR_BGR2RGB);
-
-  // Now convert that Mat to a QPixmap.
-  QPixmap pixmap = QPixmap::fromImage(QImage((unsigned char*)converted.data,
-  converted.cols, converted.rows,
-                          QImage::Format_RGB888));
+  // Convert the Mat to a QPixmap.
+  cv::Mat frame = *(frames_->next_frame());
+  QPixmap pixmap = QPixmap::fromImage(matToQImage(frame));
 
   // And show the pixmap.
   scene->addPixmap(pixmap);
 
-  QGraphicsView *view = this->findChild<QGraphicsView*>("graphicsView");
+  QGraphicsView *view = this->findChild<QGraphicsView *>("graphicsView");
   view->setScene(scene);
   view->show();
-  */
 }
