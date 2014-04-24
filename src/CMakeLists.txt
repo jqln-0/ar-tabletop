@@ -1,35 +1,43 @@
-set(SOURCE
+# Source files for the application.
+set( SOURCES
   mainwindow.cpp
-  main.cpp
   framefetcher.cpp
   denoising.cpp
 	matconv.cpp
-  filter.cpp
 )
 
-set(HEADERS
+# Header files for the application.
+set( HEADERS
   mainwindow.h
   framefetcher.h
   denoising.h
 	matconv.h
-  filter.h
 )
 
-set(FORMS
+# Qt *.ui files
+set( FORMS
   gui/window.ui
   gui/filtering.ui
 )
-
-qt5_wrap_cpp(HEADERS_MOC ${HEADERS})
 qt5_wrap_ui(FORMS_HEADERS ${FORMS})
 
-add_executable( ARTabletop
+# Compile the bulk of the application as a library for easier linking with the
+# testing framework.
+add_library( ART
   ${SOURCE}
   ${HEADERS_MOC}
   ${FORMS_HEADERS}
 )
 
+qt5_use_modules(ART Widgets)
+
+# Compile the application executable.
+add_executable( ARTabletop
+  main.cpp
+)
+
 target_link_libraries( ARTabletop
+  ART
   ${aruco_LIBS}
 )
 
