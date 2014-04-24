@@ -1,15 +1,33 @@
-add_library( Foo
-    Foo.cpp
+set(SOURCE
+  mainwindow.cpp
+  main.cpp
+  framefetcher.cpp
+  denoising.cpp
 )
 
-add_executable( FooMain
-    # Add source files here
-    FooMain.cpp
+set(HEADERS
+  mainwindow.h
+  framefetcher.h
+  denoising.h
 )
 
-target_link_libraries( FooMain
-    # Add libraries here
-    Foo
-    ${Boost_LIBRARIES}
-    ${CGAL_LIBRARIES}
+set(FORMS
+  gui/window.ui
+  gui/filtering.ui
 )
+
+qt5_wrap_cpp(HEADERS_MOC ${HEADERS})
+qt5_wrap_ui(FORMS_HEADERS ${FORMS})
+
+add_executable( ARTabletop
+  ${SOURCE}
+  ${HEADERS_MOC}
+  ${FORMS_HEADERS}
+)
+
+target_link_libraries( ARTabletop
+  ${aruco_LIBS}
+)
+
+qt5_use_modules(ARTabletop Widgets)
+
