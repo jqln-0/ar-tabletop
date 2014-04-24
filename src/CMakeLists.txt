@@ -4,6 +4,7 @@ set(SOURCE
   framefetcher.cpp
   denoising.cpp
 	matconv.cpp
+  filter.cpp
 )
 
 set(HEADERS
@@ -11,6 +12,7 @@ set(HEADERS
   framefetcher.h
   denoising.h
 	matconv.h
+  filter.h
 )
 
 set(FORMS
