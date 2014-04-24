@@ -12,5 +12,6 @@ The following dependencies are required for building:
  - Boost (I think? Should probably double check that...)
  - GLUT
  - Qt5
+ - gtest
 
 Once you have these dependencies you can build by simply running 'make'.
