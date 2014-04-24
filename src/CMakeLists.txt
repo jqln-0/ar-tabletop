@@ -3,12 +3,14 @@ set(SOURCE
   main.cpp
   framefetcher.cpp
   denoising.cpp
+	matconv.cpp
 )
 
 set(HEADERS
   mainwindow.h
   framefetcher.h
   denoising.h
+	matconv.h
 )
 
 set(FORMS
