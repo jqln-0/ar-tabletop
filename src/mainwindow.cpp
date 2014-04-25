@@ -8,12 +8,12 @@ MainWindow::MainWindow(QWidget *parent)
   ui->setupUi(this);
 
   // Create the fetcher.
-  frames_ = new MedianDenoisingFrameFetcher(new WebcamFrameFetcher(), 11);
+  frames_ = new BilateralDenoisingFrameFetcher(new WebcamFrameFetcher(), 5, 30);
 
   // Create the timer.
   frame_timer_ = new QTimer(this);
   connect(frame_timer_, SIGNAL(timeout()), this, SLOT(processFrame()));
-  frame_timer_->start(100);
+  frame_timer_->start(60.0 / 1000.0);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -32,6 +32,7 @@ void MainWindow::processFrame() {
   scene->addPixmap(pixmap);
 
   QGraphicsView *view = this->findChild<QGraphicsView *>("graphicsView");
+	view->setFixedSize(pixmap.size());
   view->setScene(scene);
   view->show();
 }

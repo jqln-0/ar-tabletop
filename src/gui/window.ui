@@ -6,20 +6,33 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>715</width>
-    <height>501</height>
+    <width>414</width>
+    <height>406</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AR Tabletop</string>
-  </property>
-  <property name="windowIcon">
-   <iconset theme="video-display"/>
+   <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QGraphicsView" name="graphicsView"/>
+     <widget class="QGraphicsView" name="graphicsView">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::AdjustToContents</enum>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -28,7 +41,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>715</width>
+     <width>414</width>
      <height>24</height>
     </rect>
    </property>
@@ -100,8 +113,7 @@
   <action name="actionOpen_Webcam">
    <property name="icon">
     <iconset theme="camera">
-     <normaloff/>
-    </iconset>
+     <normaloff>../../../../../../qt</normaloff>../../../../../../qt</iconset>
    </property>
    <property name="text">
     <string>Open Webcam</string>
@@ -116,8 +128,7 @@
   <action name="actionOpen_File">
    <property name="icon">
     <iconset theme="emblem-photos">
-     <normaloff/>
-    </iconset>
+     <normaloff>../../../../../../qt</normaloff>../../../../../../qt</iconset>
    </property>
    <property name="text">
     <string>Open File</string>
@@ -129,8 +140,7 @@
   <action name="actionLoad_Intrinsics">
    <property name="icon">
     <iconset theme="document-properties">
-     <normaloff/>
-    </iconset>
+     <normaloff>../../../../../../qt</normaloff>../../../../../../qt</iconset>
    </property>
    <property name="text">
     <string>Load Intrinsics</string>
@@ -142,8 +152,7 @@
   <action name="actionQuit">
    <property name="icon">
     <iconset theme="application-exit">
-     <normaloff/>
-    </iconset>
+     <normaloff>../../../../../../qt</normaloff>../../../../../../qt</iconset>
    </property>
    <property name="text">
     <string>Quit</string>
@@ -155,8 +164,7 @@
   <action name="actionLoad_Scene">
    <property name="icon">
     <iconset theme="document-page-setup">
-     <normaloff/>
-    </iconset>
+     <normaloff>../../../../../../qt</normaloff>../../../../../../qt</iconset>
    </property>
    <property name="text">
     <string>Load Scene</string>
