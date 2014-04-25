@@ -22,8 +22,11 @@ void MainWindow::processFrame() {
   QGraphicsScene *scene = new (QGraphicsScene);
 
   // Convert the Mat to a QPixmap.
-  cv::Mat frame = *(frames_->next_frame());
-  QPixmap pixmap = QPixmap::fromImage(matToQImage(frame));
+  cv::Mat frame;
+  frames_->GetNextFrame(&frame);
+  QImage conv;
+  matToQImage(frame, &conv);
+  QPixmap pixmap = QPixmap::fromImage(conv);
 
   // And show the pixmap.
   scene->addPixmap(pixmap);

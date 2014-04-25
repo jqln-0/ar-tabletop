@@ -1,11 +1,20 @@
 #include "matconv.h"
 
-QImage matToQImage(const cv::Mat &m) {
-  // Convert the Mat to RGB colorspace.
-  cv::Mat conv;
-  cv::cvtColor(m, conv, cv::COLOR_BGR2RGB);
+using cv::Mat;
 
-  // Construct and return the QImage.
-  return QImage((unsigned char *)conv.data, conv.cols, conv.rows,
-                QImage::Format_RGB888);
+bool matToQImage(const Mat &src, QImage *dest) {
+  // Convert the Mat to RGB colorspace.
+  Mat conv;
+  try {
+    cv::cvtColor(src, conv, cv::COLOR_BGR2RGB);
+  }
+  catch (cv::Exception) {
+    return false;
+  }
+
+  // Construct the QImage.
+  *dest = QImage((unsigned char *)conv.data, conv.cols, conv.rows,
+                 QImage::Format_RGB888);
+
+  return true;
 }

@@ -4,6 +4,6 @@
 #include <QImage>
 #include <aruco/aruco.h>
 
-QImage matToQImage(const cv::Mat &m);
+bool matToQImage(const cv::Mat &src, QImage *dest);
 
 #endif  // __MATCONV_H_

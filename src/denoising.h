@@ -14,45 +14,47 @@ class DenoisingFrameFetcher : public FrameFetcher {
   DenoisingFrameFetcher(FrameFetcher *w);
   virtual ~DenoisingFrameFetcher();
 
-  virtual std::unique_ptr<cv::Mat> next_frame() = 0;
-  virtual bool has_next_frame() const;
+  virtual bool GetNextFrame(cv::Mat *dest) = 0;
+  virtual bool HasNextFrame() const;
 
-  virtual FrameFetcher *wrapped() { return wrapped_; }
+  virtual FrameFetcher *wrapped() const { return wrapped_; }
 };
 
 class GaussianDenoisingFrameFetcher : public DenoisingFrameFetcher {
  protected:
-  cv::Size kernel_;
-  double sigma_;
+  const cv::Size kernel_;
+  const double sigma_;
 
  public:
-  GaussianDenoisingFrameFetcher(FrameFetcher *w, cv::Size kernel, double sigma);
+  GaussianDenoisingFrameFetcher(FrameFetcher *w, const cv::Size &kernel,
+                                const double sigma);
   virtual ~GaussianDenoisingFrameFetcher();
 
-  virtual std::unique_ptr<cv::Mat> next_frame();
+  virtual bool GetNextFrame(cv::Mat *dest);
 };
 
 class MedianDenoisingFrameFetcher : public DenoisingFrameFetcher {
  protected:
-  int size_;
+  const int size_;
 
  public:
-  MedianDenoisingFrameFetcher(FrameFetcher *w, int size);
+  MedianDenoisingFrameFetcher(FrameFetcher *w, const int size);
   virtual ~MedianDenoisingFrameFetcher();
 
-  virtual std::unique_ptr<cv::Mat> next_frame();
+  virtual bool GetNextFrame(cv::Mat *dest);
 };
 
 class BilateralDenoisingFrameFetcher : public DenoisingFrameFetcher {
  protected:
-  int d_;
-  double sigma_;
+  const int d_;
+  const double sigma_;
 
  public:
-  BilateralDenoisingFrameFetcher(FrameFetcher *w, int d, double sigma);
+  BilateralDenoisingFrameFetcher(FrameFetcher *w, const int d,
+                                 const double sigma);
   virtual ~BilateralDenoisingFrameFetcher();
 
-  virtual std::unique_ptr<cv::Mat> next_frame();
+  virtual bool GetNextFrame(cv::Mat *dest);
 };
 
 class NonLocalMeansDenoisingFrameFetcher : public DenoisingFrameFetcher {
@@ -60,7 +62,7 @@ class NonLocalMeansDenoisingFrameFetcher : public DenoisingFrameFetcher {
   NonLocalMeansDenoisingFrameFetcher(FrameFetcher *w);
   virtual ~NonLocalMeansDenoisingFrameFetcher();
 
-  virtual std::unique_ptr<cv::Mat> next_frame();
+  virtual bool GetNextFrame(cv::Mat *dest);
 };
 
 #endif  // __DENOISING_H_

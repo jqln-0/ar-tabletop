@@ -31,7 +31,7 @@ class SmoothingMarkerFilter : public MarkerFilter {
   std::unordered_map<int, aruco::Marker> markers_;
 
  public:
-  SmoothingMarkerFilter(int memory_length = 2);
+  SmoothingMarkerFilter(const int memory_length = 2);
 
   virtual void Filter(std::vector<aruco::Marker> *m);
 };
