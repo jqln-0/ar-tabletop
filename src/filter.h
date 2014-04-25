@@ -27,7 +27,8 @@ class BoardIgnoringMarkerFilter : public MarkerFilter {
 class SmoothingMarkerFilter : public MarkerFilter {
  protected:
   const int memory_length_;
-  std::unordered_map<int, pair<aruco::Marker, int>> markers_;
+  std::unordered_map<int, int> last_seen_;
+  std::unordered_map<int, aruco::Marker> markers_;
 
  public:
   SmoothingMarkerFilter(int memory_length = 2);

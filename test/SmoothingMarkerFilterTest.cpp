@@ -16,6 +16,22 @@ class SmoothingMarkerFilterTest : public ::testing::Test {
   std::vector<aruco::Marker> markers_;
 };
 
+TEST_F(SmoothingMarkerFilterTest, NoMissingMarkers) {
+  SmoothingMarkerFilter filter(1);
+
+  AddMarkerToVector(0);
+
+  // First pass leaves markers untouched.
+  filter.Filter(&markers_);
+  ASSERT_EQ(1, markers_.size());
+  ASSERT_EQ(0, markers_[0].id);
+
+  // Second pass leaves markers untouched.
+  filter.Filter(&markers_);
+  ASSERT_EQ(1, markers_.size());
+  ASSERT_EQ(0, markers_[0].id);
+}
+
 TEST_F(SmoothingMarkerFilterTest, RemembersMarker) {
   SmoothingMarkerFilter filter(1);
 
