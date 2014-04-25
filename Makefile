@@ -15,7 +15,7 @@ configure:
 
 build: configure
 	cd build; \
-		make
+		make -j 8
 
 format:
 	clang-format -style=Google -i src/*.cpp src/*.h test/*.cpp
