@@ -18,4 +18,4 @@ class NoiseFilterDialog : public QDialog {
   Ui::NoiseFilterDialog *ui;
 };
 
-#endif // __FILTER_DIALOG_H_
+#endif  // __FILTER_DIALOG_H_
