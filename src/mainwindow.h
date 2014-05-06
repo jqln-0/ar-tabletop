@@ -2,15 +2,16 @@
 #define MAINWINDOW_H
 
 #include <QFileDialog>
-#include <QMainWindow>
 #include <QGraphicsView>
+#include <QMainWindow>
 #include <QTimer>
 
 #include <aruco/aruco.h>
 
+#include "denoising.h"
 #include "filterdialog.h"
 #include "framefetcher.h"
-#include "denoising.h"
+#include "genmarkerdialog.h"
 #include "matconv.h"
 
 namespace Ui {
@@ -28,18 +29,18 @@ class MainWindow : public QMainWindow {
 slots:
   void ProcessFrame();
 
-	// Slots for gui.
-	void OpenCalibrateDialog();
-	void OpenFilteringDialog();
-	void OpenGenerateBoardDialog();
-	void OpenGenerateMarkerDialog();
-	void OpenIntrinsicsFile();
-	void OpenSceneFile();
-	void OpenSourceFile();
-	void OpenSourceWebcam();
-	void OpenThresholdDialog();
-	void ToggleShowMarkers();
-	void ToggleShowThreshold();
+  // Slots for gui.
+  void OpenCalibrateDialog();
+  void OpenFilteringDialog();
+  void OpenGenerateBoardDialog();
+  void OpenGenerateMarkerDialog();
+  void OpenIntrinsicsFile();
+  void OpenSceneFile();
+  void OpenSourceFile();
+  void OpenSourceWebcam();
+  void OpenThresholdDialog();
+  void ToggleShowMarkers();
+  void ToggleShowThreshold();
 
  private:
   Ui::MainWindow *ui;

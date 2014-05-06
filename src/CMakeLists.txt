@@ -1,27 +1,32 @@
 # Source files for the application.
 set( SOURCES
-  mainwindow.cpp
+	filter.cpp
+	matconv.cpp
+  denoising.cpp
   filterdialog.cpp
   framefetcher.cpp
-  denoising.cpp
-	matconv.cpp
-	filter.cpp
+  genmarkerdialog.cpp
+  mainwindow.cpp
 )
 
 # Header files for the application.
 set( HEADERS
-  mainwindow.h
+	filter.h
+	matconv.h
+  denoising.h
   filterdialog.h
   framefetcher.h
-  denoising.h
-	matconv.h
-	filter.h
+  genmarkerdialog.h
+  mainwindow.h
 )
 
 # Qt *.ui files
 set( FORMS
-  gui/window.ui
+  gui/calibrate.ui
   gui/filtering.ui
+  gui/genboard.ui
+  gui/genmarker.ui
+  gui/window.ui
 )
 qt5_wrap_ui(FORMS_HEADERS ${FORMS})
 
