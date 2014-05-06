@@ -1,12 +1,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QFileDialog>
 #include <QMainWindow>
 #include <QGraphicsView>
 #include <QTimer>
 
 #include <aruco/aruco.h>
 
+#include "filterdialog.h"
 #include "framefetcher.h"
 #include "denoising.h"
 #include "matconv.h"
@@ -24,7 +26,20 @@ class MainWindow : public QMainWindow {
 
  public
 slots:
-  void processFrame();
+  void ProcessFrame();
+
+	// Slots for gui.
+	void OpenCalibrateDialog();
+	void OpenFilteringDialog();
+	void OpenGenerateBoardDialog();
+	void OpenGenerateMarkerDialog();
+	void OpenIntrinsicsFile();
+	void OpenSceneFile();
+	void OpenSourceFile();
+	void OpenSourceWebcam();
+	void OpenThresholdDialog();
+	void ToggleShowMarkers();
+	void ToggleShowThreshold();
 
  private:
   Ui::MainWindow *ui;

@@ -7,18 +7,20 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow) {
   ui->setupUi(this);
 
+	/*
   // Create the fetcher.
   frames_ = new BilateralDenoisingFrameFetcher(new WebcamFrameFetcher(), 5, 30);
 
   // Create the timer.
   frame_timer_ = new QTimer(this);
-  connect(frame_timer_, SIGNAL(timeout()), this, SLOT(processFrame()));
+  connect(frame_timer_, SIGNAL(timeout()), this, SLOT(ProcessFrame()));
   frame_timer_->start(60.0 / 1000.0);
+	*/
 }
 
 MainWindow::~MainWindow() { delete ui; }
 
-void MainWindow::processFrame() {
+void MainWindow::ProcessFrame() {
   QGraphicsScene *scene = new (QGraphicsScene);
 
   // Convert the Mat to a QPixmap.
@@ -35,4 +37,56 @@ void MainWindow::processFrame() {
 	view->setFixedSize(pixmap.size());
   view->setScene(scene);
   view->show();
+}
+
+void MainWindow::OpenCalibrateDialog() {
+	std::cout << "Webcam calibration.\n";
+}
+
+void MainWindow::OpenFilteringDialog() {
+	NoiseFilterDialog dialog(this);
+	dialog.setModal(true);
+	dialog.exec();
+}
+
+void MainWindow::OpenGenerateBoardDialog() {
+	std::cout << "Generate board dialog.\n";
+}
+
+void MainWindow::OpenGenerateMarkerDialog() {
+	std::cout << "Generate marker dialog.\n";
+}
+
+void MainWindow::OpenIntrinsicsFile() {
+	std::cout << "Open intrinsics file.\n";
+	QString filename = QFileDialog::getOpenFileName(this, "Hello, World!");
+	if (!filename.isEmpty()) {
+		std::cout << filename.toStdString() << "\n";
+	} else {
+		std::cout << "Got nothing.\n";
+	}
+}
+
+void MainWindow::OpenSceneFile() {
+	std::cout << "Open scene file.\n";
+}
+
+void MainWindow::OpenSourceFile() {
+	std::cout << "Open source file.\n";
+}
+
+void MainWindow::OpenSourceWebcam() {
+	std::cout << "Open webcam.\n";
+}
+
+void MainWindow::OpenThresholdDialog() {
+	std::cout << "Open threshold dialog.\n";
+}
+
+void MainWindow::ToggleShowMarkers() {
+	std::cout << "Toggle markers.\n";
+}
+
+void MainWindow::ToggleShowThreshold() {
+	std::cout << "Toggle threshold.\n";
 }

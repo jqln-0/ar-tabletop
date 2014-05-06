@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Augmented Reality Tabletop</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -219,5 +219,212 @@
   </action>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionNoise_Reduction</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OpenFilteringDialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCalibrate_Webcam</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OpenCalibrateDialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionGenerate_Board</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OpenGenerateBoardDialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionGenerate_Marker</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OpenGenerateMarkerDialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLoad_Intrinsics</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OpenIntrinsicsFile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLoad_Scene</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OpenSceneFile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOpen_File</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OpenSourceFile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOpen_Webcam</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OpenSourceWebcam()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionShow_Markers</sender>
+   <signal>changed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>ToggleShowMarkers()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionShow_Threshold</sender>
+   <signal>changed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>ToggleShowThreshold()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionThreshold_Method</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>OpenThresholdDialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>OpenFilteringDialog()</slot>
+  <slot>OpenSourceWebcam()</slot>
+  <slot>OpenSourceFile()</slot>
+  <slot>OpenIntrinsicsFile()</slot>
+  <slot>OpenSceneFile()</slot>
+  <slot>Quit()</slot>
+  <slot>OpenThresholdDialog()</slot>
+  <slot>ToggleShowMarkers()</slot>
+  <slot>ToggleShowThreshold()</slot>
+  <slot>OpenGenerateBoardDialog()</slot>
+  <slot>OpenGenerateMarkerDialog()</slot>
+  <slot>OpenCalibrateDialog()</slot>
+ </slots>
 </ui>
