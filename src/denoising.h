@@ -1,7 +1,6 @@
 #ifndef __DENOISING_H_
 #define __DENOISING_H_
 
-#include <memory>
 #include <aruco/aruco.h>
 
 #include "framefetcher.h"
@@ -11,6 +10,7 @@ class DenoisingFrameFetcher : public FrameFetcher {
   FrameFetcher *wrapped_;
 
  public:
+  DenoisingFrameFetcher();
   DenoisingFrameFetcher(FrameFetcher *w);
   virtual ~DenoisingFrameFetcher();
 
@@ -18,6 +18,7 @@ class DenoisingFrameFetcher : public FrameFetcher {
   virtual bool HasNextFrame() const;
 
   virtual FrameFetcher *wrapped() const { return wrapped_; }
+  virtual void set_wrapped(FrameFetcher *fetcher) { wrapped_ = fetcher; }
 };
 
 class GaussianDenoisingFrameFetcher : public DenoisingFrameFetcher {
@@ -28,6 +29,10 @@ class GaussianDenoisingFrameFetcher : public DenoisingFrameFetcher {
  public:
   GaussianDenoisingFrameFetcher(FrameFetcher *w, const cv::Size &kernel,
                                 const double sigma);
+
+  GaussianDenoisingFrameFetcher(FrameFetcher *w, const int kernel,
+                                const double sigma);
+
   virtual ~GaussianDenoisingFrameFetcher();
 
   virtual bool GetNextFrame(cv::Mat *dest);

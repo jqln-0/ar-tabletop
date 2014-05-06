@@ -4,6 +4,8 @@ using cv::Mat;
 
 // DenoisingFrameFetcher
 
+DenoisingFrameFetcher::DenoisingFrameFetcher() : wrapped_(nullptr) {}
+
 DenoisingFrameFetcher::DenoisingFrameFetcher(FrameFetcher *w) : wrapped_(w) {}
 
 DenoisingFrameFetcher::~DenoisingFrameFetcher() {}
@@ -17,6 +19,11 @@ bool DenoisingFrameFetcher::HasNextFrame() const {
 GaussianDenoisingFrameFetcher::GaussianDenoisingFrameFetcher(
     FrameFetcher *w, const cv::Size &kernel, const double sigma)
     : DenoisingFrameFetcher(w), kernel_(kernel), sigma_(sigma) {}
+
+GaussianDenoisingFrameFetcher::GaussianDenoisingFrameFetcher(FrameFetcher *w,
+                                                             const int kernel,
+                                                             const double sigma)
+    : DenoisingFrameFetcher(w), kernel_(kernel, kernel), sigma_(sigma) {}
 
 GaussianDenoisingFrameFetcher::~GaussianDenoisingFrameFetcher() {}
 
