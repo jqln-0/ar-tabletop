@@ -1,6 +1,7 @@
 # Source files for the application.
 set( SOURCES
   mainwindow.cpp
+  filterdialog.cpp
   framefetcher.cpp
   denoising.cpp
 	matconv.cpp
@@ -10,6 +11,7 @@ set( SOURCES
 # Header files for the application.
 set( HEADERS
   mainwindow.h
+  filterdialog.h
   framefetcher.h
   denoising.h
 	matconv.h
