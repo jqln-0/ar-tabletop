@@ -30,7 +30,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTabWidget" name="NoneTab">
+    <widget class="QTabWidget" name="Filters">
      <property name="tabPosition">
       <enum>QTabWidget::North</enum>
      </property>
@@ -38,7 +38,7 @@
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="elideMode">
       <enum>Qt::ElideNone</enum>
@@ -46,7 +46,7 @@
      <property name="tabsClosable">
       <bool>false</bool>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="NoneTab">
       <attribute name="title">
        <string>None</string>
       </attribute>

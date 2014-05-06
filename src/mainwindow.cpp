@@ -45,6 +45,13 @@ void MainWindow::OpenFilteringDialog() {
   NoiseFilterDialog dialog(this);
   dialog.setModal(true);
   dialog.exec();
+
+  if (dialog.result() == dialog.Rejected) {
+    return;
+  }
+
+  std::cout << "You accepted changes!\n";
+  delete dialog.MakeFilter();
 }
 
 void MainWindow::OpenGenerateBoardDialog() {
