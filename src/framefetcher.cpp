@@ -7,26 +7,20 @@ WebcamFrameFetcher::WebcamFrameFetcher(int device_index) {
   // Open the requested webcam device.
   // TODO: Error handling if the device doesn't exist/work.
   video_capturer_.open(device_index);
-
-  // Grab the device so that we can start getting output from it.
-  video_capturer_.grab();
 }
 
-WebcamFrameFetcher::~WebcamFrameFetcher() {
-  // Only release on exit as we don't expect anyone else to be using our device.
-  video_capturer_.release();
-}
+WebcamFrameFetcher::~WebcamFrameFetcher() { video_capturer_.release(); }
 
 bool WebcamFrameFetcher::GetNextFrame(Mat *dest) {
   if (!HasNextFrame()) {
     return false;
   }
-  video_capturer_ >> *dest;
+  video_capturer_.read(*dest);
   return true;
 }
 
 bool WebcamFrameFetcher::HasNextFrame() const {
-  // cv::VideoCapture will close on EOF, so this will reliably work.
+  // cv::VideoCapture will close on EOF, so this should reliably work.
   return video_capturer_.isOpened();
 }
 
@@ -36,21 +30,15 @@ VideoFrameFetcher::VideoFrameFetcher(const string &filename) {
   // Open the requested webcam device.
   // TODO: Error handling if the device doesn't exist/work.
   video_capturer_.open(filename);
-
-  // Grab the device so that we can start getting output from it.
-  video_capturer_.grab();
 }
 
-VideoFrameFetcher::~VideoFrameFetcher() {
-  // Only release on exit as we don't expect anyone else to be using our device.
-  video_capturer_.release();
-}
+VideoFrameFetcher::~VideoFrameFetcher() { video_capturer_.release(); }
 
 bool VideoFrameFetcher::GetNextFrame(Mat *dest) {
   if (!HasNextFrame()) {
     return false;
   }
-  video_capturer_ >> *dest;
+  video_capturer_.read(*dest);
   return true;
 }
 
@@ -77,6 +65,6 @@ bool PhotoFrameFetcher::GetNextFrame(Mat *dest) {
 }
 
 bool PhotoFrameFetcher::HasNextFrame() const {
-  // Essentially this checks whether or not openning the image was successful.
-  return image_.data == NULL;
+  // Essentially this checks whether or not opening the image was successful.
+  return image_.data != NULL;
 }
