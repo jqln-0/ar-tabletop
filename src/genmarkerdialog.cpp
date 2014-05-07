@@ -1,8 +1,6 @@
 #include "genmarkerdialog.h"
 #include "ui_genmarker.h"
 
-#include <iostream>
-
 GenerateMarkerDialog::GenerateMarkerDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::GenerateMarkerDialog) {
   ui->setupUi(this);
@@ -51,16 +49,11 @@ void GenerateMarkerDialog::Generate(int id) {
   int marker_size = std::min<int>(size.width(), size.height());
 
   // Generate the marker.
-  cv::Mat marker = aruco::FiducidalMarkers::createMarkerImage(id, marker_size);
-
-  // We roll our own conversion to QImage here since the colorspace used is
-  // very strange and buggy.
-  cv::cvtColor(marker, marker_, cv::COLOR_GRAY2RGB);
-  QImage converted((unsigned char *)marker_.data, marker_.cols, marker_.rows,
-                   QImage::Format_RGB888);
+  marker_ = aruco::FiducidalMarkers::createMarkerImage(id, marker_size);
 
   // Draw the image into the view.
-  QPixmap pixmap = QPixmap::fromImage(converted);
+  QPixmap pixmap = MatToQPixmap(marker_);
+  scene_.clear();
   scene_.addPixmap(pixmap);
   view->setScene(&scene_);
   view->show();

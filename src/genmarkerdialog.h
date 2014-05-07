@@ -11,6 +11,8 @@
 #include <aruco/aruco.h>
 #include <aruco/arucofidmarkers.h>
 
+#include "matconv.h"
+
 namespace Ui {
 class GenerateMarkerDialog;
 }
