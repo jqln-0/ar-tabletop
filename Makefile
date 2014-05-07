@@ -14,6 +14,7 @@ configure:
 		cmake -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 
 build: configure
+	mkdir -p build
 	cd build; \
 		make -j 8
 
