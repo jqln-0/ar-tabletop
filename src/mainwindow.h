@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QGraphicsView>
 #include <QMainWindow>
+#include <QMessageBox>
 #include <QTimer>
 
 #include <aruco/aruco.h>
@@ -13,6 +14,7 @@
 #include "framefetcher.h"
 #include "genmarkerdialog.h"
 #include "matconv.h"
+#include "pipeline.h"
 
 namespace Ui {
 class MainWindow;
@@ -45,9 +47,12 @@ slots:
  private:
   Ui::MainWindow *ui;
   QTimer *frame_timer_;
+  Pipeline processor_;
+  QGraphicsScene scene_;
 
-  // herp derp testing only
-  FrameFetcher *frames_;
+  bool capturing_;
+  bool show_threshold_;
+  bool show_markers_;
 };
 
 #endif  // MAINWINDOW_H

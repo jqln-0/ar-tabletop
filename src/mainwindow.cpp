@@ -4,38 +4,51 @@
 #include <iostream>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow) {
+    : QMainWindow(parent),
+      ui(new Ui::MainWindow),
+      frame_timer_(nullptr),
+      capturing_(true),
+      show_threshold_(false),
+      show_markers_(false) {
   ui->setupUi(this);
 
-  /*
-// Create the fetcher.
-frames_ = new BilateralDenoisingFrameFetcher(new WebcamFrameFetcher(), 5, 30);
-
-// Create the timer.
-frame_timer_ = new QTimer(this);
-connect(frame_timer_, SIGNAL(timeout()), this, SLOT(ProcessFrame()));
-frame_timer_->start(60.0 / 1000.0);
-  */
+  frame_timer_ = new QTimer(this);
+  connect(frame_timer_, SIGNAL(timeout()), this, SLOT(ProcessFrame()));
+  frame_timer_->start(100);
 }
 
 MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::ProcessFrame() {
-  QGraphicsScene *scene = new (QGraphicsScene);
+  if (!capturing_ || processor_.source_fetcher() == nullptr) {
+    return;
+  }
 
-  // Convert the Mat to a QPixmap.
-  cv::Mat frame;
-  frames_->GetNextFrame(&frame);
-  QImage conv;
-  matToQImage(frame, &conv);
-  QPixmap pixmap = QPixmap::fromImage(conv);
+  // Perform the processing pipeline.
+  processor_.ProcessFrame();
 
-  // And show the pixmap.
-  scene->addPixmap(pixmap);
+  // Get the background image.
+  QImage backdrop;
+  bool result;
+  if (show_threshold_) {
+    result = processor_.GetThresholdedFrame(&backdrop);
+  } else {
+    result = processor_.GetFrame(&backdrop);
+  }
 
+  // Do nothing if the frame was bad.
+  if (!result) {
+    return;
+  }
+
+  // Set the view to the correct size.
   QGraphicsView *view = this->findChild<QGraphicsView *>("graphicsView");
-  view->setFixedSize(pixmap.size());
-  view->setScene(scene);
+  view->setFixedSize(backdrop.size());
+
+  // Draw image to the view.
+  scene_.clear();
+  scene_.addPixmap(QPixmap::fromImage(backdrop));
+  view->setScene(&scene_);
   view->show();
 }
 
@@ -50,8 +63,8 @@ void MainWindow::OpenFilteringDialog() {
     return;
   }
 
-  std::cout << "You accepted changes!\n";
-  delete dialog.MakeFilter();
+  DenoisingFrameFetcher *fetcher = dialog.MakeFilter();
+  processor_.set_wrapping_fetcher(fetcher);
 }
 
 void MainWindow::OpenGenerateBoardDialog() {
@@ -64,26 +77,74 @@ void MainWindow::OpenGenerateMarkerDialog() {
   dialog.exec();
 }
 
-void MainWindow::OpenIntrinsicsFile() {
-  std::cout << "Open intrinsics file.\n";
-  QString filename = QFileDialog::getOpenFileName(this, "Hello, World!");
-  if (!filename.isEmpty()) {
-    std::cout << filename.toStdString() << "\n";
-  } else {
-    std::cout << "Got nothing.\n";
-  }
-}
+void MainWindow::OpenIntrinsicsFile() { ProcessFrame(); }
 
 void MainWindow::OpenSceneFile() { std::cout << "Open scene file.\n"; }
 
-void MainWindow::OpenSourceFile() { std::cout << "Open source file.\n"; }
+void MainWindow::OpenSourceFile() {
+  // Get the user's file.
+  QFileDialog dialog(this, "Open source file");
+  dialog.setNameFilter("Image files (*.png *.jpg);;Video files (*.avi)");
+  dialog.setFileMode(QFileDialog::ExistingFile);
+  dialog.exec();
 
-void MainWindow::OpenSourceWebcam() { std::cout << "Open webcam.\n"; }
+  QStringList filenames = dialog.selectedFiles();
+  if (filenames.size() != 1) {
+    QMessageBox msg(this);
+    msg.setText("You must specify a filename!");
+    msg.exec();
+    return;
+  }
+
+  // Determine the filetype and try to create a fetcher.
+  FrameFetcher *fetcher = nullptr;
+  QStringList parts = filenames[0].split(".");
+  QString suffix = parts[parts.size() - 1];
+  if (suffix == "png") {
+    fetcher = new PhotoFrameFetcher(filenames[0].toStdString());
+  } else if (suffix == "avi") {
+    fetcher = new VideoFrameFetcher(filenames[0].toStdString());
+  } else {
+    QMessageBox msg(this);
+    msg.setText("Could not recognise file format.");
+    msg.exec();
+    return;
+  }
+
+  // Check if the fetcher is valid.
+  if (!fetcher->HasNextFrame()) {
+    delete fetcher;
+    QMessageBox msg(this);
+    msg.setText("Could not read from file.");
+    msg.exec();
+    return;
+  }
+
+  // Assign the fetcher.
+  processor_.set_source_fetcher(fetcher);
+}
+
+void MainWindow::OpenSourceWebcam() {
+  // Try to create the appropriate fetcher.
+  FrameFetcher *fetcher = new WebcamFrameFetcher();
+
+  // See if we can get frames from it.
+  if (!fetcher->HasNextFrame()) {
+    delete fetcher;
+    QMessageBox msg(this);
+    msg.setText("Error: Could not open webcam for reading.");
+    msg.exec();
+    return;
+  }
+
+  // Assign the fetcher to the pipeline.
+  processor_.set_source_fetcher(fetcher);
+}
 
 void MainWindow::OpenThresholdDialog() {
   std::cout << "Open threshold dialog.\n";
 }
 
-void MainWindow::ToggleShowMarkers() { std::cout << "Toggle markers.\n"; }
+void MainWindow::ToggleShowMarkers() { show_markers_ = !show_markers_; }
 
-void MainWindow::ToggleShowThreshold() { std::cout << "Toggle threshold.\n"; }
+void MainWindow::ToggleShowThreshold() { show_threshold_ = !show_threshold_; }
