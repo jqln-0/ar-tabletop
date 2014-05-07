@@ -1,4 +1,4 @@
-import os
+import os, inspect
 import ycm_core
 
 # These are the compilation flags that will be used in case there's no
@@ -48,7 +48,9 @@ flags = [
 #
 # Most projects will NOT need to set this to anything; you can just change the
 # 'flags' list of compilation flags. Notice that YCM itself uses that approach.
-compilation_database_folder = '/home/jacqui/Development/src/github.com/jqln-0/ar-tabletop/build'
+script_location = os.path.dirname(os.path.abspath(inspect.stack()[0][1]))
+compilation_database_folder = os.path.join(script_location, "build")
+#compilation_database_folder = '/home/jacqui/Development/src/github.com/jqln-0/ar-tabletop/build'
 
 if os.path.exists( compilation_database_folder ):
   database = ycm_core.CompilationDatabase( compilation_database_folder )
