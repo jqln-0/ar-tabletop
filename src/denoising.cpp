@@ -1,8 +1,7 @@
 #include "denoising.h"
 
+using std::shared_ptr;
 using cv::Mat;
-
-// DenoisingFrameFetcher
 
 DenoisingFrameFetcher::DenoisingFrameFetcher() : wrapped_(nullptr) {}
 
@@ -14,7 +13,13 @@ bool DenoisingFrameFetcher::HasNextFrame() const {
   return wrapped_->HasNextFrame();
 }
 
-// GaussianDenoisingFrameFetcher
+shared_ptr<FrameFetcher> DenoisingFrameFetcher::wrapped() const {
+  return wrapped_;
+}
+
+void DenoisingFrameFetcher::set_wrapped(shared_ptr<FrameFetcher> fetcher) {
+  wrapped_ = fetcher;
+}
 
 GaussianDenoisingFrameFetcher::GaussianDenoisingFrameFetcher(
     FrameFetcher *w, const cv::Size &kernel, const double sigma)
@@ -27,21 +32,15 @@ GaussianDenoisingFrameFetcher::GaussianDenoisingFrameFetcher(FrameFetcher *w,
 
 GaussianDenoisingFrameFetcher::~GaussianDenoisingFrameFetcher() {}
 
-bool GaussianDenoisingFrameFetcher::GetNextFrame(Mat *dest) {
-  if (!HasNextFrame()) {
-    return false;
-  }
-
+Mat GaussianDenoisingFrameFetcher::GetNextFrame() {
   // Fetch the next frame from the wrapped fetcher.
-  wrapped_->GetNextFrame(dest);
+  Mat src = wrapped_->GetNextFrame();
 
   // Blur the frame in-place.
-  cv::GaussianBlur(*dest, *dest, kernel_, sigma_, sigma_);
+  cv::GaussianBlur(src, src, kernel_, sigma_, sigma_);
 
-  return true;
+  return src;
 }
-
-// MedianDenoisingFrameFetcher
 
 MedianDenoisingFrameFetcher::MedianDenoisingFrameFetcher(FrameFetcher *w,
                                                          const int size)
@@ -49,20 +48,15 @@ MedianDenoisingFrameFetcher::MedianDenoisingFrameFetcher(FrameFetcher *w,
 
 MedianDenoisingFrameFetcher::~MedianDenoisingFrameFetcher() {}
 
-bool MedianDenoisingFrameFetcher::GetNextFrame(Mat *dest) {
-  if (!HasNextFrame()) {
-    return false;
-  }
+Mat MedianDenoisingFrameFetcher::GetNextFrame() {
   // Fetch the next frame from the wrapped fetcher.
-  wrapped_->GetNextFrame(dest);
+  Mat src = wrapped_->GetNextFrame();
 
   // Blur the frame in-place.
-  cv::medianBlur(*dest, *dest, size_);
+  cv::medianBlur(src, src, size_);
 
-  return true;
+  return src;
 }
-
-// BilateralDenoisingFrameFetcher
 
 BilateralDenoisingFrameFetcher::BilateralDenoisingFrameFetcher(
     FrameFetcher *w, const int d, const double sigma)
@@ -70,23 +64,17 @@ BilateralDenoisingFrameFetcher::BilateralDenoisingFrameFetcher(
 
 BilateralDenoisingFrameFetcher::~BilateralDenoisingFrameFetcher() {}
 
-bool BilateralDenoisingFrameFetcher::GetNextFrame(Mat *dest) {
-  if (!HasNextFrame()) {
-    return false;
-  }
-
-  // The bilateral filter doesn't work in-place, so fetch the next frame
-  // locally.
-  Mat src;
-  wrapped_->GetNextFrame(&src);
+Mat BilateralDenoisingFrameFetcher::GetNextFrame() {
+  // The bilateral filter doesn't work in-place, so we need to make a second
+  // mat.
+  Mat src = wrapped_->GetNextFrame();
+  Mat dest;
 
   // Run the filter.
-  cv::bilateralFilter(src, *dest, d_, sigma_, sigma_);
+  cv::bilateralFilter(src, dest, d_, sigma_, sigma_);
 
-  return true;
+  return dest;
 }
-
-// NonLocalMeansDenoisingFrameFetcher
 
 NonLocalMeansDenoisingFrameFetcher::NonLocalMeansDenoisingFrameFetcher(
     FrameFetcher *w)
@@ -94,16 +82,11 @@ NonLocalMeansDenoisingFrameFetcher::NonLocalMeansDenoisingFrameFetcher(
 
 NonLocalMeansDenoisingFrameFetcher::~NonLocalMeansDenoisingFrameFetcher() {}
 
-bool NonLocalMeansDenoisingFrameFetcher::GetNextFrame(Mat *dest) {
-  if (!HasNextFrame()) {
-    return false;
-  }
+Mat NonLocalMeansDenoisingFrameFetcher::GetNextFrame() {
+  // TODO: Check if this filter will work in-place.
+  Mat src = wrapped_->GetNextFrame();
+  Mat dest;
+  cv::fastNlMeansDenoisingColored(src, dest);
 
-  // TODO: Check if this filter works in-place.
-  Mat src;
-  wrapped_->GetNextFrame(&src);
-
-  cv::fastNlMeansDenoisingColored(src, *dest);
-
-  return true;
+  return dest;
 }

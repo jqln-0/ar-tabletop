@@ -2,52 +2,32 @@
 
 using cv::Mat;
 
-// WebcamFrameFetcher
-WebcamFrameFetcher::WebcamFrameFetcher(int device_index) {
-  // Open the requested webcam device.
-  // TODO: Error handling if the device doesn't exist/work.
-  video_capturer_.open(device_index);
-}
-
-WebcamFrameFetcher::~WebcamFrameFetcher() { video_capturer_.release(); }
-
-bool WebcamFrameFetcher::GetNextFrame(Mat *dest) {
-  if (!HasNextFrame()) {
-    return false;
-  }
-  video_capturer_.read(*dest);
-  return true;
-}
-
-bool WebcamFrameFetcher::HasNextFrame() const {
-  // cv::VideoCapture will close on EOF, so this should reliably work.
-  return video_capturer_.isOpened();
-}
-
-// VideoFrameFetcher
+VideoFrameFetcher::VideoFrameFetcher() {}
 
 VideoFrameFetcher::VideoFrameFetcher(const string &filename) {
-  // Open the requested webcam device.
-  // TODO: Error handling if the device doesn't exist/work.
+  // Open the requested video file.
   video_capturer_.open(filename);
 }
 
 VideoFrameFetcher::~VideoFrameFetcher() { video_capturer_.release(); }
 
-bool VideoFrameFetcher::GetNextFrame(Mat *dest) {
-  if (!HasNextFrame()) {
-    return false;
-  }
-  video_capturer_.read(*dest);
-  return true;
+cv::Mat VideoFrameFetcher::GetNextFrame() {
+  cv::Mat frame;
+  video_capturer_.read(frame);
+  return frame;
 }
 
 bool VideoFrameFetcher::HasNextFrame() const {
-  // cv::VideoCapture will close on EOF, so this will reliably work.
+  // Will detect both EOF and a fail to open the device.
   return video_capturer_.isOpened();
 }
 
-// PhotoFrameFetcher
+WebcamFrameFetcher::WebcamFrameFetcher(int device_index) {
+  // Open the requested webcam device.
+  video_capturer_.open(device_index);
+}
+
+WebcamFrameFetcher::~WebcamFrameFetcher() {}
 
 PhotoFrameFetcher::PhotoFrameFetcher(const string &filename) {
   image_ = cv::imread(filename, cv::IMREAD_COLOR);
@@ -55,13 +35,10 @@ PhotoFrameFetcher::PhotoFrameFetcher(const string &filename) {
 
 PhotoFrameFetcher::~PhotoFrameFetcher() {}
 
-bool PhotoFrameFetcher::GetNextFrame(Mat *dest) {
-  if (!HasNextFrame()) {
-    return false;
-  }
-  // Give the caller a copy of the stored image.
-  *dest = image_;
-  return true;
+cv::Mat PhotoFrameFetcher::GetNextFrame() {
+  // We need to explicitly copy the our image since cv::Mat will share image
+  // data.
+  return image_.clone();
 }
 
 bool PhotoFrameFetcher::HasNextFrame() const {

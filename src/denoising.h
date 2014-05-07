@@ -1,24 +1,25 @@
 #ifndef __DENOISING_H_
 #define __DENOISING_H_
 
+#include <memory>
 #include <aruco/aruco.h>
 
 #include "framefetcher.h"
 
 class DenoisingFrameFetcher : public FrameFetcher {
  protected:
-  FrameFetcher *wrapped_;
+  std::shared_ptr<FrameFetcher> wrapped_;
 
  public:
   DenoisingFrameFetcher();
   DenoisingFrameFetcher(FrameFetcher *w);
   virtual ~DenoisingFrameFetcher();
 
-  virtual bool GetNextFrame(cv::Mat *dest) = 0;
+  virtual cv::Mat GetNextFrame() = 0;
   virtual bool HasNextFrame() const;
 
-  virtual FrameFetcher *wrapped() const { return wrapped_; }
-  virtual void set_wrapped(FrameFetcher *fetcher) { wrapped_ = fetcher; }
+  virtual std::shared_ptr<FrameFetcher> wrapped() const;
+  virtual void set_wrapped(std::shared_ptr<FrameFetcher> fetcher);
 };
 
 class GaussianDenoisingFrameFetcher : public DenoisingFrameFetcher {
@@ -35,7 +36,7 @@ class GaussianDenoisingFrameFetcher : public DenoisingFrameFetcher {
 
   virtual ~GaussianDenoisingFrameFetcher();
 
-  virtual bool GetNextFrame(cv::Mat *dest);
+  virtual cv::Mat GetNextFrame();
 };
 
 class MedianDenoisingFrameFetcher : public DenoisingFrameFetcher {
@@ -46,7 +47,7 @@ class MedianDenoisingFrameFetcher : public DenoisingFrameFetcher {
   MedianDenoisingFrameFetcher(FrameFetcher *w, const int size);
   virtual ~MedianDenoisingFrameFetcher();
 
-  virtual bool GetNextFrame(cv::Mat *dest);
+  virtual cv::Mat GetNextFrame();
 };
 
 class BilateralDenoisingFrameFetcher : public DenoisingFrameFetcher {
@@ -59,7 +60,7 @@ class BilateralDenoisingFrameFetcher : public DenoisingFrameFetcher {
                                  const double sigma);
   virtual ~BilateralDenoisingFrameFetcher();
 
-  virtual bool GetNextFrame(cv::Mat *dest);
+  virtual cv::Mat GetNextFrame();
 };
 
 class NonLocalMeansDenoisingFrameFetcher : public DenoisingFrameFetcher {
@@ -67,7 +68,7 @@ class NonLocalMeansDenoisingFrameFetcher : public DenoisingFrameFetcher {
   NonLocalMeansDenoisingFrameFetcher(FrameFetcher *w);
   virtual ~NonLocalMeansDenoisingFrameFetcher();
 
-  virtual bool GetNextFrame(cv::Mat *dest);
+  virtual cv::Mat GetNextFrame();
 };
 
 #endif  // __DENOISING_H_
