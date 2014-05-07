@@ -91,7 +91,9 @@ void MainWindow::OpenSourceFile() {
   QFileDialog dialog(this, "Open source file");
   dialog.setNameFilter("Image files (*.png *.jpg);;Video files (*.avi)");
   dialog.setFileMode(QFileDialog::ExistingFile);
-  dialog.exec();
+  if (!dialog.exec()) {
+		return;
+	}
 
   QStringList filenames = dialog.selectedFiles();
   if (filenames.size() != 1) {
