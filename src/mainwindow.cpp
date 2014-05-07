@@ -3,6 +3,10 @@
 
 #include <iostream>
 
+using std::make_shared;
+using std::shared_ptr;
+using std::static_pointer_cast;
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       ui(new Ui::MainWindow),
@@ -20,7 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::ProcessFrame() {
-  if (!capturing_ || processor_.source_fetcher() == nullptr) {
+  // Check if we are ready and permitted to process frames.
+  if (!capturing_ || !processor_.IsReady()) {
     return;
   }
 
@@ -29,15 +34,14 @@ void MainWindow::ProcessFrame() {
 
   // Get the background image.
   QImage backdrop;
-  bool result;
   if (show_threshold_) {
-    result = processor_.GetThresholdedFrame(&backdrop);
+    backdrop = processor_.GetThresholdedFrame(show_markers_);
   } else {
-    result = processor_.GetFrame(&backdrop);
+    backdrop = processor_.GetFrame(show_markers_);
   }
 
   // Do nothing if the frame was bad.
-  if (!result) {
+  if (backdrop.size().isEmpty()) {
     return;
   }
 
@@ -58,13 +62,14 @@ void MainWindow::OpenFilteringDialog() {
   NoiseFilterDialog dialog(this);
   dialog.setModal(true);
   dialog.exec();
-
   if (dialog.result() == dialog.Rejected) {
     return;
   }
 
-  DenoisingFrameFetcher *fetcher = dialog.MakeFilter();
-  processor_.set_wrapping_fetcher(fetcher);
+  shared_ptr<FrameFetcher> fetcher = dialog.MakeFilter();
+  if (fetcher) {
+    processor_.set_fetcher(fetcher);
+  }
 }
 
 void MainWindow::OpenGenerateBoardDialog() {
@@ -96,41 +101,35 @@ void MainWindow::OpenSourceFile() {
     return;
   }
 
-  // Determine the filetype and try to create a fetcher.
-  FrameFetcher *fetcher = nullptr;
-  QStringList parts = filenames[0].split(".");
-  QString suffix = parts[parts.size() - 1];
-  if (suffix == "png") {
-    fetcher = new PhotoFrameFetcher(filenames[0].toStdString());
-  } else if (suffix == "avi") {
-    fetcher = new VideoFrameFetcher(filenames[0].toStdString());
-  } else {
-    QMessageBox msg(this);
-    msg.setText("Could not recognise file format.");
-    msg.exec();
-    return;
+  // Try both kinds of possible fetcher, use whichever one is valid.
+
+  // Try the photo fetcher first.
+  shared_ptr<FrameFetcher> fetcher =
+      make_shared<PhotoFrameFetcher>(filenames[0].toStdString());
+
+  // Alternatively try the video fetcher.
+  if (!fetcher->HasNextFrame()) {
+    fetcher = make_shared<VideoFrameFetcher>(filenames[0].toStdString());
   }
 
   // Check if the fetcher is valid.
   if (!fetcher->HasNextFrame()) {
-    delete fetcher;
     QMessageBox msg(this);
-    msg.setText("Could not read from file.");
+    msg.setText("Failed to read file! The format may be incorrect.");
     msg.exec();
     return;
   }
 
   // Assign the fetcher.
-  processor_.set_source_fetcher(fetcher);
+  processor_.set_fetcher(fetcher);
 }
 
 void MainWindow::OpenSourceWebcam() {
   // Try to create the appropriate fetcher.
-  FrameFetcher *fetcher = new WebcamFrameFetcher();
+  shared_ptr<FrameFetcher> fetcher = make_shared<WebcamFrameFetcher>();
 
   // See if we can get frames from it.
   if (!fetcher->HasNextFrame()) {
-    delete fetcher;
     QMessageBox msg(this);
     msg.setText("Error: Could not open webcam for reading.");
     msg.exec();
@@ -138,7 +137,7 @@ void MainWindow::OpenSourceWebcam() {
   }
 
   // Assign the fetcher to the pipeline.
-  processor_.set_source_fetcher(fetcher);
+  processor_.set_fetcher(fetcher);
 }
 
 void MainWindow::OpenThresholdDialog() {

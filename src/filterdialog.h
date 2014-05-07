@@ -19,7 +19,7 @@ class NoiseFilterDialog : public QDialog {
   explicit NoiseFilterDialog(QWidget *parent = 0);
   ~NoiseFilterDialog();
 
-  DenoisingFrameFetcher *MakeFilter();
+  std::shared_ptr<DenoisingFrameFetcher> MakeFilter();
 
  protected:
   // Gaussian properties.

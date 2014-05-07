@@ -1,7 +1,8 @@
 #include "filterdialog.h"
 #include "ui_filtering.h"
 
-#include <iostream>
+using std::make_shared;
+using std::shared_ptr;
 
 NoiseFilterDialog::NoiseFilterDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::NoiseFilterDialog) {
@@ -10,31 +11,26 @@ NoiseFilterDialog::NoiseFilterDialog(QWidget *parent)
 
 NoiseFilterDialog::~NoiseFilterDialog() { delete ui; }
 
-DenoisingFrameFetcher *NoiseFilterDialog::MakeFilter() {
+shared_ptr<DenoisingFrameFetcher> NoiseFilterDialog::MakeFilter() {
   // Work out which kind of filter the user has chosen.
   QTabWidget *tabs = this->findChild<QTabWidget *>("Filters");
   QWidget *current_tab = tabs->currentWidget();
   QString filter_name = current_tab->objectName();
 
-  std::cout << filter_name.toStdString() << "\n";
-  if (filter_name == "NoneTab") {
-    return nullptr;
-  } else if (filter_name == "GaussianTab") {
-    return new GaussianDenoisingFrameFetcher(nullptr, GetKernel(),
-                                             GetGaussianSigma());
+  shared_ptr<DenoisingFrameFetcher> fetcher;
+  if (filter_name == "GaussianTab") {
+    fetcher = make_shared<GaussianDenoisingFrameFetcher>(nullptr, GetKernel(),
+                                                         GetGaussianSigma());
   } else if (filter_name == "MedianTab") {
-    return new MedianDenoisingFrameFetcher(nullptr, GetSize());
+    fetcher = make_shared<MedianDenoisingFrameFetcher>(nullptr, GetSize());
   } else if (filter_name == "BilateralTab") {
-    return new BilateralDenoisingFrameFetcher(nullptr, GetD(),
-                                              GetBilateralSigma());
+    fetcher = make_shared<BilateralDenoisingFrameFetcher>(nullptr, GetD(),
+                                                          GetBilateralSigma());
   } else if (filter_name == "NonLocalMeansTab") {
-    return new NonLocalMeansDenoisingFrameFetcher(nullptr);
-  } else {
-    std::cerr << "Warning: Unknown filter selected!\n";
-    return nullptr;
+    fetcher = make_shared<NonLocalMeansDenoisingFrameFetcher>(nullptr);
   }
 
-  return nullptr;
+  return fetcher;
 }
 
 int NoiseFilterDialog::GetKernel() {

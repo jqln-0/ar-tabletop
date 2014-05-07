@@ -1,7 +1,9 @@
 #ifndef __PIPELINE_H_
 #define __PIPELINE_H_
 
+#include <memory>
 #include <QImage>
+#include <QObject>
 #include <vector>
 
 #include <aruco/aruco.h>
@@ -11,36 +13,39 @@
 #include "filter.h"
 #include "matconv.h"
 
-class Pipeline {
+class Pipeline : public QObject {
+  Q_OBJECT
+
  protected:
   // Frame fetching and processing.
-  FrameFetcher *source_fetcher_;
-  DenoisingFrameFetcher *wrapping_fetcher_;
+  std::shared_ptr<FrameFetcher> fetcher_;
   cv::Mat frame_;
 
   // Marker detection.
-  aruco::MarkerDetector *detector_;
-  std::vector<MarkerFilter> filters_;
+  mutable aruco::MarkerDetector detector_;
+  std::vector<std::unique_ptr<MarkerFilter>> filters_;
   std::vector<aruco::Marker> markers_;
 
   // Scene information.
   aruco::CameraParameters camera_;
   aruco::BoardConfiguration board_;
 
+  void DrawMarkers(cv::Mat dest) const;
+
  public:
   Pipeline();
   virtual ~Pipeline();
 
-  FrameFetcher *source_fetcher();
-  void set_source_fetcher(FrameFetcher *f);
-  DenoisingFrameFetcher *wrapping_fetcher();
-  void set_wrapping_fetcher(DenoisingFrameFetcher *f);
+  std::shared_ptr<FrameFetcher> fetcher() const;
+  void set_fetcher(std::shared_ptr<FrameFetcher> f);
+  void set_fetcher(std::shared_ptr<DenoisingFrameFetcher> f);
 
-  std::vector<aruco::Marker> *markers();
+  const std::vector<aruco::Marker> &markers() const;
 
-  bool GetFrame(QImage *dest);
-  bool GetThresholdedFrame(QImage *dest);
-  void DrawMarkers();
+  QImage GetFrame(bool markers = false) const;
+  QImage GetThresholdedFrame(bool markers = false) const;
+
+  bool IsReady() const;
 
   // ProcessFrame fetches a frame and performs marker detection on it.
   void ProcessFrame();

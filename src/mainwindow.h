@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QTimer>
+#include <memory>
 
 #include <aruco/aruco.h>
 
