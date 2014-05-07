@@ -10,7 +10,7 @@ NoiseFilterDialog::NoiseFilterDialog(QWidget *parent)
 
 NoiseFilterDialog::~NoiseFilterDialog() { delete ui; }
 
-FrameFetcher *NoiseFilterDialog::MakeFilter() {
+DenoisingFrameFetcher *NoiseFilterDialog::MakeFilter() {
   // Work out which kind of filter the user has chosen.
   QTabWidget *tabs = this->findChild<QTabWidget *>("Filters");
   QWidget *current_tab = tabs->currentWidget();
