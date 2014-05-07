@@ -1,12 +1,12 @@
 # Source files for the application.
 set( SOURCES
 	filter.cpp
-	matconv.cpp
   denoising.cpp
   filterdialog.cpp
   framefetcher.cpp
   genmarkerdialog.cpp
   mainwindow.cpp
+  pipeline.cpp
 )
 
 # Header files for the application.
@@ -18,6 +18,7 @@ set( HEADERS
   framefetcher.h
   genmarkerdialog.h
   mainwindow.h
+  pipeline.h
 )
 
 # Qt *.ui files
