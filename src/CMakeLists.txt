@@ -1,6 +1,7 @@
 # Source files for the application.
 set( SOURCES
 	filter.cpp
+	graphics.cpp
   denoising.cpp
   filterdialog.cpp
   framefetcher.cpp
@@ -12,6 +13,7 @@ set( SOURCES
 # Header files for the application.
 set( HEADERS
 	filter.h
+	graphics.h
 	matconv.h
   denoising.h
   filterdialog.h
@@ -41,9 +43,10 @@ add_library( ART
 
 target_link_libraries( ART
   ${aruco_LIBS}
+	${OPENGL_LIBS}
 )
 
-qt5_use_modules(ART Widgets)
+qt5_use_modules(ART Core Gui OpenGL Widgets)
 
 # Compile the application executable.
 add_executable( ARTabletop
@@ -53,6 +56,5 @@ add_executable( ARTabletop
 target_link_libraries( ARTabletop
   ART
 )
-
-qt5_use_modules(ARTabletop Widgets)
+qt5_use_modules(ARTabletop Core Gui OpenGL Widgets)
 

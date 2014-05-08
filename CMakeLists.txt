@@ -19,6 +19,11 @@ find_package( Qt5Widgets REQUIRED )
 SET( CMAKE_MODULE_PATH /lib/cmake/ )
 find_package( aruco REQUIRED )
 
+# OpenGL and GLUT.
+find_package(OpenGL)
+find_package(GLUT)
+set(OPENGL_LIBS ${OPENGL_gl_LIBRARY} ${GLUT_glub_LIBRARY})
+
 # Build application.
 add_subdirectory( src )
 
