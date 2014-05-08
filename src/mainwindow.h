@@ -12,6 +12,7 @@
 
 #include "denoising.h"
 #include "filterdialog.h"
+#include "graphics.h"
 #include "framefetcher.h"
 #include "genmarkerdialog.h"
 #include "matconv.h"
@@ -49,7 +50,8 @@ slots:
   Ui::MainWindow *ui;
   QTimer *frame_timer_;
   Pipeline processor_;
-  QGraphicsScene scene_;
+  QGraphicsScene scene_2d_;
+	SceneWidget *scene_3d_;
 
   bool capturing_;
   bool show_threshold_;

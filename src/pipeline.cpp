@@ -92,7 +92,7 @@ void Pipeline::ProcessFrame() {
 
   // Next run our detector and filters.
   // TODO: Use camera, board, marker info.
-  detector_.detect(frame_, markers_);
+  detector_.detect(frame_, markers_, camera_, 1.0);
   for (auto it = filters_.begin(); it != filters_.end(); ++it) {
     (*it)->Filter(&markers_);
   }

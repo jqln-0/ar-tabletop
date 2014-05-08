@@ -18,7 +18,11 @@ MainWindow::MainWindow(QWidget *parent)
 
   frame_timer_ = new QTimer(this);
   connect(frame_timer_, SIGNAL(timeout()), this, SLOT(ProcessFrame()));
-  frame_timer_->start(100);
+  frame_timer_->start(50);
+
+	QGraphicsView *view = this->findChild<QGraphicsView*>("graphicsView");
+	scene_3d_ = new SceneWidget(view);
+	scene_3d_->hide();
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -29,7 +33,7 @@ void MainWindow::ProcessFrame() {
     return;
   }
 
-  // Perform the processing pipeline.
+  // Run through the processing pipeline.
   processor_.ProcessFrame();
 
   // Get the background image.
@@ -45,14 +49,19 @@ void MainWindow::ProcessFrame() {
     return;
   }
 
-  // Set the view to the correct size.
+	// Inform the SceneWidget of the detected markers.
+	scene_3d_->set_markers(processor_.markers());
+
+  // Set the view and scene to the correct size.
   QGraphicsView *view = this->findChild<QGraphicsView *>("graphicsView");
+	scene_3d_->setFixedSize(backdrop.size());
   view->setFixedSize(backdrop.size());
 
-  // Draw image to the view.
-  scene_.clear();
-  scene_.addPixmap(QPixmap::fromImage(backdrop));
-  view->setScene(&scene_);
+  // Draw image and scene to view.
+  scene_2d_.clear();
+  scene_2d_.addPixmap(QPixmap::fromImage(backdrop));
+	scene_2d_.addPixmap(scene_3d_->renderPixmap(backdrop.size().width(), backdrop.size().height()));
+  view->setScene(&scene_2d_);
   view->show();
 }
 
