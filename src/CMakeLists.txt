@@ -1,25 +1,27 @@
 # Source files for the application.
 set( SOURCES
-	filter.cpp
-	graphics.cpp
+  calibration.cpp
   denoising.cpp
+  filter.cpp
   filterdialog.cpp
   framefetcher.cpp
   genmarkerdialog.cpp
+  graphics.cpp
   mainwindow.cpp
   pipeline.cpp
 )
 
 # Header files for the application.
 set( HEADERS
-	filter.h
-	graphics.h
-	matconv.h
+  calibration.h
   denoising.h
+  filter.h
   filterdialog.h
   framefetcher.h
   genmarkerdialog.h
+  graphics.h
   mainwindow.h
+  matconv.h
   pipeline.h
 )
 
