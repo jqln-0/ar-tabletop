@@ -10,11 +10,12 @@
 
 #include <aruco/aruco.h>
 
+#include "calibration.h"
 #include "denoising.h"
 #include "filterdialog.h"
-#include "graphics.h"
 #include "framefetcher.h"
 #include "genmarkerdialog.h"
+#include "graphics.h"
 #include "matconv.h"
 #include "pipeline.h"
 
@@ -51,7 +52,7 @@ slots:
   QTimer *frame_timer_;
   Pipeline processor_;
   QGraphicsScene scene_2d_;
-	SceneWidget *scene_3d_;
+  SceneWidget *scene_3d_;
 
   bool capturing_;
   bool show_threshold_;

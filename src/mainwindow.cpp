@@ -20,9 +20,9 @@ MainWindow::MainWindow(QWidget *parent)
   connect(frame_timer_, SIGNAL(timeout()), this, SLOT(ProcessFrame()));
   frame_timer_->start(50);
 
-	QGraphicsView *view = this->findChild<QGraphicsView*>("graphicsView");
-	scene_3d_ = new SceneWidget(view);
-	scene_3d_->hide();
+  QGraphicsView *view = this->findChild<QGraphicsView *>("graphicsView");
+  scene_3d_ = new SceneWidget(view);
+  scene_3d_->hide();
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -49,23 +49,40 @@ void MainWindow::ProcessFrame() {
     return;
   }
 
-	// Inform the SceneWidget of the detected markers.
-	scene_3d_->set_markers(processor_.markers());
+  // Inform the SceneWidget of the detected markers.
+  scene_3d_->set_markers(processor_.markers());
 
   // Set the view and scene to the correct size.
   QGraphicsView *view = this->findChild<QGraphicsView *>("graphicsView");
-	scene_3d_->setFixedSize(backdrop.size());
+  scene_3d_->setFixedSize(backdrop.size());
   view->setFixedSize(backdrop.size());
 
   // Draw image and scene to view.
   scene_2d_.clear();
   scene_2d_.addPixmap(QPixmap::fromImage(backdrop));
-	scene_2d_.addPixmap(scene_3d_->renderPixmap(backdrop.size().width(), backdrop.size().height()));
+  scene_2d_.addPixmap(scene_3d_->renderPixmap(backdrop.size().width(),
+                                              backdrop.size().height()));
   view->setScene(&scene_2d_);
   view->show();
 }
 
-void MainWindow::OpenCalibrateDialog() { std::cout << "Webcam calibration.\n"; }
+void MainWindow::OpenCalibrateDialog() {
+  // We need to have a source of frames to pass to the calibrator.
+  shared_ptr<FrameFetcher> fetcher = processor_.fetcher();
+  if (!fetcher) {
+    QMessageBox msg(this);
+    msg.setText("Select a source (webcam or file) before calibrating.");
+    msg.exec();
+    return;
+  }
+
+  // Pause capturing until the calibrator is done since it'll want to use the
+  // FrameFetcher.
+  capturing_ = false;
+  CalibrateDialog calibrator(fetcher, this);
+  calibrator.exec();
+  capturing_ = true;
+}
 
 void MainWindow::OpenFilteringDialog() {
   NoiseFilterDialog dialog(this);
@@ -101,8 +118,8 @@ void MainWindow::OpenSourceFile() {
   dialog.setNameFilter("Image files (*.png *.jpg);;Video files (*.avi)");
   dialog.setFileMode(QFileDialog::ExistingFile);
   if (!dialog.exec()) {
-		return;
-	}
+    return;
+  }
 
   QStringList filenames = dialog.selectedFiles();
   if (filenames.size() != 1) {
