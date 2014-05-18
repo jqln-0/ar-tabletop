@@ -87,12 +87,16 @@ void Pipeline::ProcessFrame() {
   }
 
   // Fetch the image.
-  // TODO: The fetcher should run in a seperate thread so we don't fall behind
-  // webcam streams.
   if (!fetcher_->HasNextFrame()) {
     return;
   }
-  frame_ = fetcher_->GetNextFrame();
+
+  if (camera_.isValid()) {
+    cv::Mat raw_frame = fetcher_->GetNextFrame();
+    cv::undistort(raw_frame, frame_, camera_.CameraMatrix, camera_.Distorsion);
+  } else {
+    frame_ = fetcher_->GetNextFrame();
+  }
 
   // Next run our detector and filters.
   // TODO: Use camera, board, marker info.
