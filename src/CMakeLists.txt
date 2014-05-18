@@ -5,6 +5,7 @@ set( SOURCES
   filter.cpp
   filterdialog.cpp
   framefetcher.cpp
+	genboarddialog.cpp
   genmarkerdialog.cpp
   graphics.cpp
   mainwindow.cpp
@@ -18,6 +19,7 @@ set( HEADERS
   filter.h
   filterdialog.h
   framefetcher.h
+	genboarddialog.h
   genmarkerdialog.h
   graphics.h
   mainwindow.h
