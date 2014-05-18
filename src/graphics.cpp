@@ -5,7 +5,7 @@ SceneWidget::SceneWidget(QWidget *parent)
 
 void SceneWidget::set_camera(const aruco::CameraParameters &camera) {
   camera_ = camera;
-  camera_.resize(cv::Size(this->width(), this->height()));
+  //camera_.resize(cv::Size(this->width(), this->height()));
 }
 
 void SceneWidget::initializeGL() {

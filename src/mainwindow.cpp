@@ -124,6 +124,7 @@ void MainWindow::OpenIntrinsicsFile() {
     aruco::CameraParameters params;
     params.readFromFile(dialog.selectedFiles()[0].toStdString());
     processor_.set_camera(params);
+    scene_3d_->set_camera(params);
   }
   catch (cv::Exception e) {
     QMessageBox msg(this);
