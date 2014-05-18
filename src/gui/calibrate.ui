@@ -6,26 +6,66 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>331</width>
-    <height>242</height>
+    <width>474</width>
+    <height>210</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Calibrate Webcam</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="4">
-    <widget class="QGraphicsView" name="graphicsView"/>
+   <item row="0" column="0" rowspan="6">
+    <widget class="QGraphicsView" name="graphicsView">
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::AdjustToContents</enum>
+     </property>
+    </widget>
    </item>
-   <item row="1" column="3">
-    <widget class="QPushButton" name="pushButton_2">
+   <item row="0" column="2">
+    <widget class="QSpinBox" name="markerSize">
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>99</number>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="QPushButton" name="capture">
      <property name="text">
       <string>Close</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="pushButton">
+   <item row="0" column="1">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Marker size (mm) </string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="loadBoard">
+     <property name="text">
+      <string>Load Board</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="pushButton_3">
      <property name="text">
       <string>Capture</string>
      </property>
@@ -34,17 +74,30 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
-    <widget class="QPushButton" name="pushButton_3">
+   <item row="5" column="1">
+    <widget class="QPushButton" name="pushButton_4">
      <property name="text">
       <string>Save</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QLabel" name="label">
+   <item row="3" column="2">
+    <widget class="QLCDNumber" name="viewpointCount">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="mode">
+      <enum>QLCDNumber::Dec</enum>
+     </property>
+     <property name="segmentStyle">
+      <enum>QLCDNumber::Flat</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Ready.</string>
+      <string>Viewpoints</string>
      </property>
     </widget>
    </item>
@@ -53,20 +106,73 @@
  <resources/>
  <connections>
   <connection>
-   <sender>pushButton_2</sender>
-   <signal>clicked()</signal>
+   <sender>loadBoard</sender>
+   <signal>pressed()</signal>
    <receiver>CalibrateDialog</receiver>
-   <slot>reject()</slot>
+   <slot>OpenBoardDialog()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>361</x>
-     <y>267</y>
+     <x>426</x>
+     <y>59</y>
     </hint>
     <hint type="destinationlabel">
-     <x>398</x>
-     <y>250</y>
+     <x>393</x>
+     <y>193</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_3</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>CalibrateDialog</receiver>
+   <slot>ToggleCapture(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>475</x>
+     <y>65</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>456</x>
+     <y>190</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_4</sender>
+   <signal>pressed()</signal>
+   <receiver>CalibrateDialog</receiver>
+   <slot>OpenSaveDialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>422</x>
+     <y>348</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>384</x>
+     <y>313</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>capture</sender>
+   <signal>pressed()</signal>
+   <receiver>CalibrateDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>518</x>
+     <y>348</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>486</x>
+     <y>304</y>
     </hint>
    </hints>
   </connection>
  </connections>
+ <slots>
+  <slot>OpenBoardDialog()</slot>
+  <slot>ToggleCapture(bool)</slot>
+  <slot>OpenSaveDialog()</slot>
+ </slots>
 </ui>
