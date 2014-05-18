@@ -14,6 +14,7 @@
 #include "denoising.h"
 #include "filterdialog.h"
 #include "framefetcher.h"
+#include "genboarddialog.h"
 #include "genmarkerdialog.h"
 #include "graphics.h"
 #include "matconv.h"

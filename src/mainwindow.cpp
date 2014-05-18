@@ -99,7 +99,9 @@ void MainWindow::OpenFilteringDialog() {
 }
 
 void MainWindow::OpenGenerateBoardDialog() {
-  std::cout << "Generate board dialog.\n";
+  GenerateBoardDialog dialog(this);
+  dialog.setModal(true);
+  dialog.exec();
 }
 
 void MainWindow::OpenGenerateMarkerDialog() {
@@ -108,7 +110,28 @@ void MainWindow::OpenGenerateMarkerDialog() {
   dialog.exec();
 }
 
-void MainWindow::OpenIntrinsicsFile() { ProcessFrame(); }
+void MainWindow::OpenIntrinsicsFile() {
+  // Get the user's file.
+  QFileDialog dialog(this, "Open camera file.");
+  dialog.setNameFilter("Camera files (*.camera)");
+  dialog.setFileMode(QFileDialog::ExistingFile);
+  if (!dialog.exec()) {
+    return;
+  }
+
+  // Try to read camera parameters from the file.
+  try {
+    aruco::CameraParameters params;
+    params.readFromFile(dialog.selectedFiles()[0].toStdString());
+    processor_.set_camera(params);
+  }
+  catch (cv::Exception e) {
+    QMessageBox msg(this);
+    msg.setText("Failed to read camera parameters from file.");
+    msg.exec();
+    return;
+  }
+}
 
 void MainWindow::OpenSceneFile() { std::cout << "Open scene file.\n"; }
 
