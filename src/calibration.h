@@ -6,6 +6,7 @@
 #include <QGraphicsView>
 #include <QLCDNumber>
 #include <QMessageBox>
+#include <QProgressDialog>
 #include <QTimer>
 #include <memory>
 #include <vector>
@@ -40,8 +41,8 @@ slots:
   float GetMinimumDistanceToStoredT(cv::Mat t);
   void SetViewpoint(std::vector<cv::Point3f> &obj_points,
                     std::vector<cv::Point2f> &img_points);
-  void GetPoints(aruco::Board &b, std::vector<cv::Point3f> obj_points,
-                 std::vector<cv::Point2f> img_points);
+  void GetPoints(aruco::Board &b, std::vector<cv::Point3f> *obj_points,
+                 std::vector<cv::Point2f> *img_points);
 
  protected:
   // Capture vars.

@@ -9,7 +9,8 @@ CalibrateDialog::CalibrateDialog(shared_ptr<FrameFetcher> source,
     : QDialog(parent),
       ui(new Ui::CalibrateDialog),
       source_(source),
-      min_viewpoint_distance_(0.025),
+      min_viewpoint_distance_(0.05),
+      capturing_(false),
       board_okay_(false) {
   ui->setupUi(this);
 
@@ -83,17 +84,10 @@ void CalibrateDialog::OpenBoardDialog() {
 }
 
 void CalibrateDialog::OpenSaveDialog() {
-  // Perform final calibration.
-  try {
-    cv::calibrateCamera(object_points_, image_points_, camera_.CamSize,
-                        camera_.CameraMatrix, camera_.Distorsion, r_vectors_,
-                        t_vectors_);
-  }
-  catch (cv::Exception e) {
+  // Make sure we have enough viewpoints to calibrate.
+  if (this->findChild<QLCDNumber *>("viewpointCount")->intValue() < 3) {
     QMessageBox msg(this);
-    msg.setText(
-        "Could not calibrate camera. Ensure enough viewpoints have"
-        " been captured.");
+    msg.setText("Need >= 3 viewpoints before saving.");
     msg.exec();
     return;
   }
@@ -106,6 +100,24 @@ void CalibrateDialog::OpenSaveDialog() {
   dialog.setAcceptMode(QFileDialog::AcceptSave);
   if (!dialog.exec()) {
     return;
+  }
+
+  // Perform final calibration.
+  try {
+    QProgressDialog progress(this);
+    progress.setLabelText("Performing final calibration.");
+    progress.setMinimum(0);
+    progress.setMaximum(0);
+    progress.open();
+    cv::calibrateCamera(object_points_, image_points_, camera_.CamSize,
+                        camera_.CameraMatrix, camera_.Distorsion, r_vectors_,
+                        t_vectors_);
+    progress.close();
+  }
+  catch (cv::Exception e) {
+    QMessageBox msg(this);
+    msg.setText("Final calibration failed.");
+    msg.exec();
   }
 
   // Save the file.
@@ -130,6 +142,7 @@ void CalibrateDialog::ToggleCapture(bool state) {
     this->findChild<QPushButton *>("loadBoard")->setDisabled(true);
 
     // Reset the calibration information.
+    this->findChild<QLCDNumber *>("viewpointCount")->display(0);
     image_points_.clear();
     object_points_.clear();
     r_vectors_.clear();
@@ -153,7 +166,7 @@ void CalibrateDialog::CalibrationFrame(cv::Mat &f) {
   if (confidence > 0.2) {
     vector<cv::Point3f> obj_points;
     vector<cv::Point2f> img_points;
-    GetPoints(detector_.getDetectedBoard(), obj_points, img_points);
+    GetPoints(detector_.getDetectedBoard(), &obj_points, &img_points);
     SetViewpoint(obj_points, img_points);
   }
 }
@@ -161,10 +174,10 @@ void CalibrateDialog::CalibrationFrame(cv::Mat &f) {
 aruco::CameraParameters CalibrateDialog::GuessCamera(cv::Size s) {
   aruco::CameraParameters camera;
   cv::Mat camera_matrix = cv::Mat::eye(3, 3, CV_32F);
-  camera_matrix.at<float>(0, 0) = 500.0;
-  camera_matrix.at<float>(1, 1) = 500.0;
-  camera_matrix.at<float>(0, 2) = s.width / 2.0;
-  camera_matrix.at<float>(1, 2) = s.height / 2.0;
+  camera_matrix.at<float>(0, 0) = 500;
+  camera_matrix.at<float>(1, 1) = 500;
+  camera_matrix.at<float>(0, 2) = s.width / 2;
+  camera_matrix.at<float>(1, 2) = s.height / 2;
   camera.setParams(camera_matrix, cv::Mat::zeros(1, 5, CV_32F), s);
   return camera;
 }
@@ -215,16 +228,16 @@ void CalibrateDialog::SetViewpoint(vector<cv::Point3f> &obj_points,
 }
 
 void CalibrateDialog::GetPoints(aruco::Board &b,
-                                std::vector<cv::Point3f> obj_points,
-                                std::vector<cv::Point2f> img_points) {
+                                std::vector<cv::Point3f> *obj_points,
+                                std::vector<cv::Point2f> *img_points) {
   int num_points = b.size() * 4;
 
   // TODO : What does *any* of this do?
   for (size_t i = 0; i < b.size(); ++i) {
-    const aruco::MarkerInfo &marker = b.conf.getMarkerInfo(b[i].id);
+    const aruco::MarkerInfo &info = b.conf.getMarkerInfo(b[i].id);
     for (size_t j = 0; j < 4; ++j) {
-      img_points.push_back(b[i][j]);
-      obj_points.push_back(marker[j]);
+      img_points->push_back(b[i][j]);
+      obj_points->push_back(info[j]);
     }
   }
 }
