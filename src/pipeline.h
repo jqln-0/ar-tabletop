@@ -40,6 +40,9 @@ class Pipeline : public QObject {
   void set_fetcher(std::shared_ptr<FrameFetcher> f);
   void set_fetcher(std::shared_ptr<DenoisingFrameFetcher> f);
 
+  void set_camera(const aruco::CameraParameters &c);
+  void set_board(const aruco::BoardConfiguration &b);
+
   const std::vector<aruco::Marker> &markers() const;
 
   QImage GetFrame(bool markers = false) const;

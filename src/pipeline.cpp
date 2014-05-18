@@ -41,6 +41,10 @@ void Pipeline::set_fetcher(shared_ptr<FrameFetcher> f) {
 
 const vector<Marker> &Pipeline::markers() const { return markers_; }
 
+void Pipeline::set_camera(const aruco::CameraParameters &c) { camera_ = c; }
+
+void Pipeline::set_board(const aruco::BoardConfiguration &b) { board_ = b; }
+
 QImage Pipeline::GetFrame(bool markers) const {
   // If markers are desired then we will need to draw them on a copy of the
   // frame.
