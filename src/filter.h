@@ -1,11 +1,12 @@
 #ifndef __FILTER_H_
 #define __FILTER_H_
 
-#include <unordered_set>
-#include <unordered_map>
-#include <vector>
-#include <utility>
 #include <aruco/aruco.h>
+
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <vector>
 
 class MarkerFilter {
  public:

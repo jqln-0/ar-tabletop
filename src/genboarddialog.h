@@ -6,11 +6,12 @@
 #include <QGraphicsPixmapItem>
 #include <QGraphicsView>
 #include <QMessageBox>
-#include <string>
-#include <vector>
 
 #include <aruco/aruco.h>
 #include <aruco/arucofidmarkers.h>
+
+#include <string>
+#include <vector>
 
 #include "matconv.h"
 

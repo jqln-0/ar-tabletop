@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
   connect(frame_timer_, SIGNAL(timeout()), this, SLOT(ProcessFrame()));
   frame_timer_->start(50);
 
-  QGraphicsView *view = this->findChild<QGraphicsView *>("graphicsView");
+  auto view = this->findChild<QGraphicsView *>("graphicsView");
   scene_3d_ = new SceneWidget(view);
   scene_3d_->hide();
 }
@@ -53,7 +53,7 @@ void MainWindow::ProcessFrame() {
   scene_3d_->set_markers(processor_.markers());
 
   // Set the view and scene to the correct size.
-  QGraphicsView *view = this->findChild<QGraphicsView *>("graphicsView");
+  auto view = this->findChild<QGraphicsView *>("graphicsView");
   scene_3d_->setFixedSize(backdrop.size());
   view->setFixedSize(backdrop.size());
 
@@ -154,10 +154,10 @@ void MainWindow::OpenSourceFile() {
   }
 
   // Try both kinds of possible fetcher, use whichever one is valid.
+  shared_ptr<FrameFetcher> fetcher;
 
   // Try the photo fetcher first.
-  shared_ptr<FrameFetcher> fetcher =
-      make_shared<PhotoFrameFetcher>(filenames[0].toStdString());
+  fetcher = make_shared<PhotoFrameFetcher>(filenames[0].toStdString());
 
   // Alternatively try the video fetcher.
   if (!fetcher->HasNextFrame()) {

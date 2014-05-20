@@ -8,10 +8,11 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QTimer>
-#include <memory>
-#include <vector>
 
 #include <aruco/aruco.h>
+
+#include <memory>
+#include <vector>
 
 #include "framefetcher.h"
 #include "matconv.h"
@@ -25,7 +26,7 @@ class CalibrateDialog : public QDialog {
 
  public:
   explicit CalibrateDialog(std::shared_ptr<FrameFetcher> source,
-                           QWidget *parent = 0);
+                           QWidget *parent = nullptr);
   ~CalibrateDialog();
 
  public

@@ -1,12 +1,13 @@
 #ifndef __PIPELINE_H_
 #define __PIPELINE_H_
 
-#include <memory>
 #include <QImage>
 #include <QObject>
-#include <vector>
 
 #include <aruco/aruco.h>
+
+#include <memory>
+#include <vector>
 
 #include "denoising.h"
 #include "framefetcher.h"

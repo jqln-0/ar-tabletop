@@ -44,7 +44,7 @@ void GenerateMarkerDialog::Save() {
 
 void GenerateMarkerDialog::Generate(int id) {
   // Work out the size of the marker to generate.
-  QGraphicsView *view = this->findChild<QGraphicsView *>("graphicsView");
+  auto view = this->findChild<QGraphicsView *>("graphicsView");
   QSize size = view->size();
   int marker_size = std::min<int>(size.width(), size.height());
 

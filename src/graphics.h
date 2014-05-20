@@ -1,9 +1,11 @@
 #ifndef __GRAPHICS_H_
 #define __GRAPHICS_H_
 
-#include <aruco/aruco.h>
 #include <QGLWidget>
 #include <QtOpenGL>
+
+#include <aruco/aruco.h>
+
 #include <vector>
 
 class SceneWidget : public QGLWidget {

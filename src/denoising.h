@@ -1,8 +1,9 @@
 #ifndef __DENOISING_H_
 #define __DENOISING_H_
 
-#include <memory>
 #include <aruco/aruco.h>
+
+#include <memory>
 
 #include "framefetcher.h"
 

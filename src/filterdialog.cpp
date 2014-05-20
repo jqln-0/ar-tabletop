@@ -13,7 +13,7 @@ NoiseFilterDialog::~NoiseFilterDialog() { delete ui; }
 
 shared_ptr<DenoisingFrameFetcher> NoiseFilterDialog::MakeFilter() {
   // Work out which kind of filter the user has chosen.
-  QTabWidget *tabs = this->findChild<QTabWidget *>("Filters");
+  auto tabs = this->findChild<QTabWidget *>("Filters");
   QWidget *current_tab = tabs->currentWidget();
   QString filter_name = current_tab->objectName();
 
@@ -34,26 +34,21 @@ shared_ptr<DenoisingFrameFetcher> NoiseFilterDialog::MakeFilter() {
 }
 
 int NoiseFilterDialog::GetKernel() {
-  QSpinBox *box = this->findChild<QSpinBox *>("kernel");
-  return box->value();
+  return this->findChild<QSpinBox *>("kernel")->value();
 }
 
 double NoiseFilterDialog::GetGaussianSigma() {
-  QDoubleSpinBox *box = this->findChild<QDoubleSpinBox *>("gaussianSigma");
-  return box->value();
+  return this->findChild<QDoubleSpinBox *>("gaussianSigma")->value();
 }
 
 int NoiseFilterDialog::GetSize() {
-  QSpinBox *box = this->findChild<QSpinBox *>("size");
-  return box->value();
+  return this->findChild<QSpinBox *>("size")->value();
 }
 
 int NoiseFilterDialog::GetD() {
-  QSpinBox *box = this->findChild<QSpinBox *>("d");
-  return box->value();
+  return this->findChild<QSpinBox *>("d")->value();
 }
 
 double NoiseFilterDialog::GetBilateralSigma() {
-  QDoubleSpinBox *box = this->findChild<QDoubleSpinBox *>("bilateralSigma");
-  return box->value();
+  return this->findChild<QDoubleSpinBox *>("bilateralSigma")->value();
 }

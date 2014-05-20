@@ -6,9 +6,10 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QTimer>
-#include <memory>
 
 #include <aruco/aruco.h>
+
+#include <memory>
 
 #include "calibration.h"
 #include "denoising.h"

@@ -3,6 +3,7 @@
 
 #include <iostream>
 
+// TODO: Move these constants into some kind of configuration options.
 static const size_t kMarkerSize = 250;
 static const size_t kBoardWidth = 10;
 static const size_t kBoardHeight = 7;
@@ -12,6 +13,7 @@ GenerateBoardDialog::GenerateBoardDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::GenerateBoardDialog) {
   ui->setupUi(this);
   // Generate the vector of disallowed ids.
+  // TODO: Move to a constant, sync with marker generator.
   for (int id = 0; id < 100; ++id) {
     disallowed_ids_.push_back(id);
   }
@@ -85,7 +87,7 @@ void GenerateBoardDialog::Generate(int type) {
   }
 
   // Scale the image to a displayable size.
-  QGraphicsView *view = this->findChild<QGraphicsView *>("graphicsView");
+  auto view = this->findChild<QGraphicsView *>("graphicsView");
   cv::Mat resized;
   cv::resize(board_image_, resized, cv::Size(0, 0), 0.1, 0.1);
 

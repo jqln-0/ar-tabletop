@@ -2,6 +2,7 @@
 
 using aruco::Marker;
 using cv::Mat;
+using std::dynamic_pointer_cast;
 using std::shared_ptr;
 using std::vector;
 
@@ -14,10 +15,8 @@ shared_ptr<FrameFetcher> Pipeline::fetcher() const { return fetcher_; }
 void Pipeline::set_fetcher(shared_ptr<FrameFetcher> f) {
   // Check if either the current fetcher or the given fetcher is really a
   // DenoisingFrameFetcher;
-  shared_ptr<DenoisingFrameFetcher> f_cast =
-      std::dynamic_pointer_cast<DenoisingFrameFetcher>(f);
-  shared_ptr<DenoisingFrameFetcher> fetcher_cast =
-      std::dynamic_pointer_cast<DenoisingFrameFetcher>(fetcher_);
+  auto f_cast = dynamic_pointer_cast<DenoisingFrameFetcher>(f);
+  auto fetcher_cast = dynamic_pointer_cast<DenoisingFrameFetcher>(fetcher_);
 
   if (fetcher_cast && f_cast) {
     // Both are DenoisingFrameFetchers. Replace the current outer fetcher with

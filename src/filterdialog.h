@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QTabWidget>
+
 #include <memory>
 
 #include "denoising.h"

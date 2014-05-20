@@ -15,7 +15,7 @@ CalibrateDialog::CalibrateDialog(shared_ptr<FrameFetcher> source,
   ui->setupUi(this);
 
   // Set up the graphics view.
-  QGraphicsView *view = this->findChild<QGraphicsView *>("graphicsView");
+  auto view = this->findChild<QGraphicsView *>("graphicsView");
   view->setScene(&scene_);
   view->show();
 
@@ -49,7 +49,7 @@ void CalibrateDialog::ProcessFrame() {
   }
 
   // Resize the view to fit the frame.
-  QGraphicsView *view = this->findChild<QGraphicsView *>("graphicsView");
+  auto view = this->findChild<QGraphicsView *>("graphicsView");
   view->setFixedSize(frame.size().width, frame.size().height);
 
   // Draw the frame to the screen.
