@@ -30,7 +30,7 @@ void SceneWidget::paintGL() {
   double projection_matrix[16];
   cv::Size widget_size(this->size().width(), this->size().height());
   camera_.glGetProjectionMatrix(widget_size, widget_size, projection_matrix,
-                                0.05, 10);
+                                0.05, 1000);
   glLoadMatrixd(projection_matrix);
 
   for (auto it = markers_.begin(); it != markers_.end(); ++it) {
