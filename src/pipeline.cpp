@@ -6,7 +6,10 @@ using std::dynamic_pointer_cast;
 using std::shared_ptr;
 using std::vector;
 
-Pipeline::Pipeline() {}
+Pipeline::Pipeline() {
+  filters_.push_back(
+      std::make_shared<SmoothingMarkerFilter>(SmoothingMarkerFilter(3)));
+}
 
 Pipeline::~Pipeline() {}
 

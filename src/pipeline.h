@@ -24,7 +24,7 @@ class Pipeline : public QObject {
 
   // Marker detection.
   mutable aruco::MarkerDetector detector_;
-  std::vector<std::unique_ptr<MarkerFilter>> filters_;
+  std::vector<std::shared_ptr<MarkerFilter>> filters_;
   std::vector<aruco::Marker> markers_;
 
   // Scene information.
@@ -49,7 +49,7 @@ class Pipeline : public QObject {
   QImage GetFrame(bool markers = false) const;
   QImage GetThresholdedFrame(bool markers = false) const;
 
-	cv::Size GetFrameSize() const;
+  cv::Size GetFrameSize() const;
 
   bool IsReady() const;
 
