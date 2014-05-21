@@ -49,6 +49,8 @@ class Pipeline : public QObject {
   QImage GetFrame(bool markers = false) const;
   QImage GetThresholdedFrame(bool markers = false) const;
 
+	cv::Size GetFrameSize() const;
+
   bool IsReady() const;
 
   // ProcessFrame fetches a frame and performs marker detection on it.

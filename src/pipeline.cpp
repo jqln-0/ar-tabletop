@@ -71,6 +71,10 @@ QImage Pipeline::GetThresholdedFrame(bool markers) const {
   return MatToQImage(out);
 }
 
+cv::Size Pipeline::GetFrameSize() const {
+	return frame_.size();
+}
+
 void Pipeline::DrawMarkers(Mat dest) const {
   for (auto it = markers_.cbegin(); it != markers_.cend(); ++it) {
     it->draw(dest, cv::Scalar(0, 0, 0), 1, true);
