@@ -22,7 +22,7 @@ CalibrateDialog::CalibrateDialog(shared_ptr<FrameFetcher> source,
   // Begin the timer.
   timer_ = new QTimer(this);
   connect(timer_, SIGNAL(timeout()), this, SLOT(ProcessFrame()));
-  timer_->start(50);
+  timer_->start(100);
 
   // Estimate initial camera parameters.
   cv::Mat frame = source_->GetNextFrame();
@@ -76,9 +76,6 @@ void CalibrateDialog::OpenBoardDialog() {
     return;
   }
 
-  if (!board_.isExpressedInMeters()) {
-    ConvertBoard();
-  }
   board_okay_ = true;
   detector_.setParams(board_);
 }
@@ -121,7 +118,7 @@ void CalibrateDialog::OpenSaveDialog() {
   }
 
   // Save the file.
-  camera_.saveToFile(dialog.selectedFiles()[0].toStdString(), false);
+  camera_.saveToFile(dialog.selectedFiles()[0].toStdString(), true);
 }
 
 void CalibrateDialog::ToggleCapture(bool state) {
@@ -132,6 +129,12 @@ void CalibrateDialog::ToggleCapture(bool state) {
     msg.setText("Load a board before capturing.");
     msg.exec();
     return;
+  }
+
+  // Make sure the board is in the correct scale.
+  if (!board_.isExpressedInMeters()) {
+    ConvertBoard();
+    detector_.setParams(board_);
   }
 
   capturing_ = state;
@@ -244,13 +247,13 @@ void CalibrateDialog::GetPoints(aruco::Board &b,
 
 double CalibrateDialog::GetMarkerSize() {
   QSpinBox *b = this->findChild<QSpinBox *>("markerSize");
-  return b->value() / 1000;
+  return double(b->value()) / 1000.0;
 }
 
 void CalibrateDialog::ConvertBoard() {
   // First get the size of each marker in pixels and determine a scaling
   // factor.
-  int marker_size_pixels = cv::norm(board_[0][0] - board_[0][1]);
+  double marker_size_pixels = cv::norm(board_[0][0] - board_[0][1]);
   double pixel_size = GetMarkerSize() / marker_size_pixels;
 
   // Now change the board size flag and the size of each marker.
