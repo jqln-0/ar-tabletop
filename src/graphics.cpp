@@ -15,12 +15,12 @@ void SceneWidget::initializeGL() {
 }
 
 void SceneWidget::paintGL() {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
   // Abort painting if the camera is invalid.
   if (!camera_.isValid()) {
     return;
   }
-
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // Reset the matrix and mode.
   glMatrixMode(GL_PROJECTION);
