@@ -56,10 +56,10 @@ slots:
   QGraphicsScene scene_2d_;
   SceneWidget *scene_3d_;
 
-	// We can't give the processor or 3D scene a camera until it's been resized to
-	// fit the frames, so we store it until that's been done.
-	bool camera_resized_;
-	aruco::CameraParameters camera_;
+  // We can't give the processor or 3D scene a camera until it's been resized to
+  // fit the frames, so we store it until that's been done.
+  bool camera_resized_;
+  aruco::CameraParameters camera_;
 
   bool capturing_;
   bool show_threshold_;

@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
       capturing_(true),
       show_threshold_(false),
       show_markers_(false),
-			camera_resized_(false) {
+      camera_resized_(false) {
   ui->setupUi(this);
 
   frame_timer_ = new QTimer(this);
@@ -37,13 +37,12 @@ void MainWindow::ProcessFrame() {
   // Run through the processing pipeline.
   processor_.ProcessFrame();
 
-	if (!camera_resized_ && camera_.isValid()) {
-		camera_.resize(processor_.GetFrameSize());
-		processor_.set_camera(camera_);
-		scene_3d_->set_camera(camera_);
-		camera_resized_ = true;
-	}
-
+  if (!camera_resized_ && camera_.isValid()) {
+    camera_.resize(processor_.GetFrameSize());
+    processor_.set_camera(camera_);
+    scene_3d_->set_camera(camera_);
+    camera_resized_ = true;
+  }
 
   // Get the background image.
   QImage backdrop;
@@ -69,8 +68,10 @@ void MainWindow::ProcessFrame() {
   // Draw image and scene to view.
   scene_2d_.clear();
   scene_2d_.addPixmap(QPixmap::fromImage(backdrop));
-  scene_2d_.addPixmap(scene_3d_->renderPixmap(backdrop.size().width(),
-                                              backdrop.size().height()));
+  if (!show_threshold_ && !show_markers_) {
+    scene_2d_.addPixmap(scene_3d_->renderPixmap(backdrop.size().width(),
+                                                backdrop.size().height()));
+  }
   view->setScene(&scene_2d_);
   view->show();
 }
@@ -132,11 +133,11 @@ void MainWindow::OpenIntrinsicsFile() {
   try {
     camera_.readFromXMLFile(dialog.selectedFiles()[0].toStdString());
 
-		// The new camera is likely the wrong size. Make sure we resize it before
-		// use.
-		processor_.set_camera(aruco::CameraParameters());
-		scene_3d_->set_camera(aruco::CameraParameters());
-		camera_resized_ = false;
+    // The new camera is likely the wrong size. Make sure we resize it before
+    // use.
+    processor_.set_camera(aruco::CameraParameters());
+    scene_3d_->set_camera(aruco::CameraParameters());
+    camera_resized_ = false;
   }
   catch (cv::Exception e) {
     QMessageBox msg(this);
