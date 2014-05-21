@@ -13,12 +13,13 @@ MainWindow::MainWindow(QWidget *parent)
       frame_timer_(nullptr),
       capturing_(true),
       show_threshold_(false),
-      show_markers_(false) {
+      show_markers_(false),
+			camera_resized_(false) {
   ui->setupUi(this);
 
   frame_timer_ = new QTimer(this);
   connect(frame_timer_, SIGNAL(timeout()), this, SLOT(ProcessFrame()));
-  frame_timer_->start(50);
+  frame_timer_->start(100);
 
   auto view = this->findChild<QGraphicsView *>("graphicsView");
   scene_3d_ = new SceneWidget(view);
@@ -35,6 +36,14 @@ void MainWindow::ProcessFrame() {
 
   // Run through the processing pipeline.
   processor_.ProcessFrame();
+
+	if (!camera_resized_ && camera_.isValid()) {
+		camera_.resize(processor_.GetFrameSize());
+		processor_.set_camera(camera_);
+		scene_3d_->set_camera(camera_);
+		camera_resized_ = true;
+	}
+
 
   // Get the background image.
   QImage backdrop;
@@ -121,10 +130,13 @@ void MainWindow::OpenIntrinsicsFile() {
 
   // Try to read camera parameters from the file.
   try {
-    aruco::CameraParameters params;
-    params.readFromFile(dialog.selectedFiles()[0].toStdString());
-    processor_.set_camera(params);
-    scene_3d_->set_camera(params);
+    camera_.readFromXMLFile(dialog.selectedFiles()[0].toStdString());
+
+		// The new camera is likely the wrong size. Make sure we resize it before
+		// use.
+		processor_.set_camera(aruco::CameraParameters());
+		scene_3d_->set_camera(aruco::CameraParameters());
+		camera_resized_ = false;
   }
   catch (cv::Exception e) {
     QMessageBox msg(this);
