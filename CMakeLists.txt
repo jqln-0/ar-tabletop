@@ -24,6 +24,9 @@ find_package(OpenGL)
 find_package(GLUT)
 set(OPENGL_LIBS ${OPENGL_gl_LIBRARY} ${GLUT_glub_LIBRARY})
 
+# assimp
+find_package(assimp)
+
 # Build application.
 add_subdirectory( src )
 

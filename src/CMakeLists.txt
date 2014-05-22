@@ -1,15 +1,16 @@
 # Source files for the application.
 set( SOURCES
+	genboarddialog.cpp
   calibration.cpp
   denoising.cpp
   filter.cpp
   filterdialog.cpp
   framefetcher.cpp
-	genboarddialog.cpp
   genmarkerdialog.cpp
   graphics.cpp
   mainwindow.cpp
   pipeline.cpp
+  scene.cpp
 )
 
 # Header files for the application.
@@ -25,6 +26,7 @@ set( HEADERS
   mainwindow.h
   matconv.h
   pipeline.h
+  scene.h
 )
 
 # Qt *.ui files
@@ -48,6 +50,7 @@ add_library( ART
 target_link_libraries( ART
   ${aruco_LIBS}
 	${OPENGL_LIBS}
+	${ASSIMP_LIBRARIES}
 )
 
 qt5_use_modules(ART Core Gui OpenGL Widgets)
