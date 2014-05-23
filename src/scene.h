@@ -3,6 +3,7 @@
 
 #include <QSettings>
 #include <QtOpenGL>
+#include <QFileInfo>
 
 #include <aruco/aruco.h>
 
@@ -21,6 +22,8 @@ class Model {
   Model();
   Model(Assimp::Importer &importer, const string &filename);
   void Render();
+	void RenderNode(const aiNode *node);
+	void ApplyMaterial(size_t index);
   bool IsValid();
 };
 
@@ -30,8 +33,11 @@ class Scene {
   std::unordered_map<int, Model> models_;
   Assimp::Importer importer_;
 
+	std::string RelativeTo(QString scene_filename, QString filename);
+
  public:
-  Scene(string filename);
+	Scene(QString filename);
+	void DrawModel(int id);
 };
 
 #endif  // __SCENE_H_

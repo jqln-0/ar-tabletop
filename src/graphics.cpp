@@ -5,13 +5,29 @@ SceneWidget::SceneWidget(QWidget *parent)
 
 void SceneWidget::set_camera(const aruco::CameraParameters &camera) {
   camera_ = camera;
-  // camera_.resize(cv::Size(this->width(), this->height()));
+}
+
+void SceneWidget::set_scene(std::shared_ptr<Scene> scene) {
+	scene_ = scene;
 }
 
 void SceneWidget::initializeGL() {
   glClearColor(0, 0, 0, 0);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_SMOOTH);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_COLOR_MATERIAL);
+
+	// Setup lighting.
+	GLfloat light_position[] = {1, 1, 0, 0};
+	GLfloat light_ambient[] = {0.2, 0.2, 0.2, 1};
+	GLfloat light_diffuse[] = {1, 1, 1, 1};
+	GLfloat light_specular[] = {1, 1, 1, 1};
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
 }
 
 void SceneWidget::paintGL() {
@@ -39,16 +55,15 @@ void SceneWidget::paintGL() {
     glLoadIdentity();
 
     // Calculate and use the marker's matrix.
-    // TODO.
     double modelview_matrix[16];
     it->glGetModelViewMatrix(modelview_matrix);
     glLoadMatrixd(modelview_matrix);
 
-    // Draw the marker's model.
-    // TODO.
-    DrawCube();
+    // Draw this marker's model.
+		if (scene_) {
+			scene_->DrawModel(it->id);
+		}
 
-    // TODO: wtf does this do?
     glPopMatrix();
   }
 }
@@ -65,58 +80,4 @@ void SceneWidget::resizeGL(int width, int height) {
 
 void SceneWidget::set_markers(const std::vector<aruco::Marker> &markers) {
   markers_ = markers;
-}
-
-void SceneWidget::DrawCube() {
-  glPushMatrix();
-
-  glBegin(GL_POLYGON);
-  qglColor(Qt::red);
-  glVertex3f(-0.5, -0.5, -0.5);
-  glVertex3f(-0.5, 0.5, -0.5);
-  glVertex3f(0.5, 0.5, -0.5);
-  glVertex3f(0.5, -0.5, -0.5);
-  glEnd();
-
-  glBegin(GL_POLYGON);
-  qglColor(Qt::green);
-  glVertex3f(0.5, -0.5, 0.5);
-  glVertex3f(0.5, 0.5, 0.5);
-  glVertex3f(-0.5, 0.5, 0.5);
-  glVertex3f(-0.5, -0.5, 0.5);
-  glEnd();
-
-  glBegin(GL_POLYGON);
-  qglColor(Qt::blue);
-  glVertex3f(0.5, -0.5, -0.5);
-  glVertex3f(0.5, 0.5, -0.5);
-  glVertex3f(0.5, 0.5, 0.5);
-  glVertex3f(0.5, -0.5, 0.5);
-  glEnd();
-
-  glBegin(GL_POLYGON);
-  qglColor(Qt::yellow);
-  glVertex3f(-0.5, -0.5, 0.5);
-  glVertex3f(-0.5, 0.5, 0.5);
-  glVertex3f(-0.5, 0.5, -0.5);
-  glVertex3f(-0.5, -0.5, -0.5);
-  glEnd();
-
-  glBegin(GL_POLYGON);
-  qglColor(Qt::magenta);
-  glVertex3f(0.5, 0.5, 0.5);
-  glVertex3f(0.5, 0.5, -0.5);
-  glVertex3f(-0.5, 0.5, -0.5);
-  glVertex3f(-0.5, 0.5, 0.5);
-  glEnd();
-
-  glBegin(GL_POLYGON);
-  qglColor(Qt::cyan);
-  glVertex3f(0.5, -0.5, -0.5);
-  glVertex3f(0.5, -0.5, 0.5);
-  glVertex3f(-0.5, -0.5, 0.5);
-  glVertex3f(-0.5, -0.5, -0.5);
-  glEnd();
-
-  glPopMatrix();
 }

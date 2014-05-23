@@ -20,6 +20,7 @@
 #include "graphics.h"
 #include "matconv.h"
 #include "pipeline.h"
+#include "scene.h"
 
 namespace Ui {
 class MainWindow;
@@ -51,10 +52,11 @@ slots:
 
  private:
   Ui::MainWindow *ui;
-  QTimer *frame_timer_;
+	QTimer *frame_timer_;
   Pipeline processor_;
   QGraphicsScene scene_2d_;
-  SceneWidget *scene_3d_;
+	std::shared_ptr<SceneWidget> scene_3d_;
+	std::shared_ptr<Scene> current_scene_;
 
   // We can't give the processor or 3D scene a camera until it's been resized to
   // fit the frames, so we store it until that's been done.

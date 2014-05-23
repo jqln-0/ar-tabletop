@@ -22,11 +22,14 @@ MainWindow::MainWindow(QWidget *parent)
   frame_timer_->start(100);
 
   auto view = this->findChild<QGraphicsView *>("graphicsView");
-  scene_3d_ = new SceneWidget(view);
+  scene_3d_ = make_shared<SceneWidget>(this);
   scene_3d_->hide();
 }
 
-MainWindow::~MainWindow() { delete ui; }
+MainWindow::~MainWindow() {
+	delete frame_timer_;
+	delete ui;
+}
 
 void MainWindow::ProcessFrame() {
   // Check if we are ready and permitted to process frames.
@@ -147,7 +150,20 @@ void MainWindow::OpenIntrinsicsFile() {
   }
 }
 
-void MainWindow::OpenSceneFile() { std::cout << "Open scene file.\n"; }
+void MainWindow::OpenSceneFile() {
+	QFileDialog dialog(this, "Open scene file.");
+	dialog.setNameFilter("Scene files (*.scene)");
+	dialog.setFileMode(QFileDialog::ExistingFile);
+	if (!dialog.exec()) {
+		return;
+	}
+
+	// Load the given scene file.
+	current_scene_ = make_shared<Scene>(dialog.selectedFiles()[0]);
+
+	// Inform the 3D scene renderer of the new scene.
+	scene_3d_->set_scene(current_scene_);
+}
 
 void MainWindow::OpenSourceFile() {
   // Get the user's file.
@@ -158,23 +174,15 @@ void MainWindow::OpenSourceFile() {
     return;
   }
 
-  QStringList filenames = dialog.selectedFiles();
-  if (filenames.size() != 1) {
-    QMessageBox msg(this);
-    msg.setText("You must specify a filename!");
-    msg.exec();
-    return;
-  }
-
   // Try both kinds of possible fetcher, use whichever one is valid.
   shared_ptr<FrameFetcher> fetcher;
 
   // Try the photo fetcher first.
-  fetcher = make_shared<PhotoFrameFetcher>(filenames[0].toStdString());
+  fetcher = make_shared<PhotoFrameFetcher>(dialog.selectedFiles()[0].toStdString());
 
   // Alternatively try the video fetcher.
   if (!fetcher->HasNextFrame()) {
-    fetcher = make_shared<VideoFrameFetcher>(filenames[0].toStdString());
+    fetcher = make_shared<VideoFrameFetcher>(dialog.selectedFiles()[0].toStdString());
   }
 
   // Check if the fetcher is valid.
