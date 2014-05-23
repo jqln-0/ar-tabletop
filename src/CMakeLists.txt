@@ -50,7 +50,6 @@ add_library( ART
 target_link_libraries( ART
   ${aruco_LIBS}
 	${OPENGL_LIBS}
-	${ASSIMP_LIBRARIES}
 )
 
 qt5_use_modules(ART Core Gui OpenGL Widgets)

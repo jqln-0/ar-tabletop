@@ -7,23 +7,44 @@
 
 #include <aruco/aruco.h>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include <unordered_map>
+#include <vector>
+
+enum PLYState {
+  kInitial,
+  kHeader,
+  kVertices,
+  kFaces,
+};
+
+class Vertex {
+ public:
+  // Vertex position.
+  float x, y, z;
+  // Normal direction.
+  float nx, ny, nz;
+  // Color.
+  float r, g, b;
+};
+
+class Face {
+ public:
+  std::vector<size_t> vertices;
+};
 
 class Model {
  protected:
   bool valid_;
-  const aiScene *scene_;
+  std::vector<Vertex> vertices_;
+  std::vector<Face> faces_;
 
  public:
   Model();
-  Model(Assimp::Importer &importer, const string &filename);
+  Model(const string &filename);
   void Render();
-	void RenderNode(const aiNode *node);
-	void ApplyMaterial(size_t index);
   bool IsValid();
 };
 
@@ -31,13 +52,12 @@ class Scene {
  protected:
   aruco::BoardConfiguration board_;
   std::unordered_map<int, Model> models_;
-  Assimp::Importer importer_;
 
-	std::string RelativeTo(QString scene_filename, QString filename);
+  std::string RelativeTo(QString scene_filename, QString filename);
 
  public:
-	Scene(QString filename);
-	void DrawModel(int id);
+  Scene(QString filename);
+  void DrawModel(int id);
 };
 
 #endif  // __SCENE_H_
