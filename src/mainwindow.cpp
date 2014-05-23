@@ -51,12 +51,16 @@ void MainWindow::ProcessFrame() {
   QImage backdrop;
   if (show_threshold_) {
     backdrop = processor_.GetThresholdedFrame(show_markers_);
+  } else if (show_markers_) {
+    backdrop = processor_.GetFrame(show_markers_);
+  } else if (current_scene_ && current_scene_->HasBackground()) {
+    backdrop = current_scene_->background();
   } else {
     backdrop = processor_.GetFrame(show_markers_);
   }
 
   // Do nothing if the frame was bad.
-  if (backdrop.size().isEmpty()) {
+  if (processor_.GetFrameSize().area() == 0) {
     return;
   }
 
@@ -64,19 +68,20 @@ void MainWindow::ProcessFrame() {
   scene_3d_->set_markers(processor_.markers());
 
   // Set the view and scene to the correct size.
+  QSize frame_size(processor_.GetFrameSize().width,
+                   processor_.GetFrameSize().height);
   auto view = this->findChild<QGraphicsView *>("graphicsView");
-  scene_3d_->setFixedSize(backdrop.size());
-  view->setFixedSize(backdrop.size());
+  scene_3d_->setFixedSize(frame_size);
+  view->setFixedSize(frame_size);
 
   // Draw image and scene to view.
   scene_2d_.clear();
-  scene_2d_.addPixmap(QPixmap::fromImage(backdrop));
+  scene_2d_.setBackgroundBrush(backdrop);
   if (!show_threshold_ && !show_markers_) {
-    scene_2d_.addPixmap(scene_3d_->renderPixmap(backdrop.size().width(),
-                                                backdrop.size().height()));
+    scene_2d_.addPixmap(
+        scene_3d_->renderPixmap(frame_size.width(), frame_size.height()));
   }
   view->setScene(&scene_2d_);
-  view->show();
 }
 
 void MainWindow::OpenCalibrateDialog() {

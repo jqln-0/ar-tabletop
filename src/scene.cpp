@@ -13,7 +13,7 @@ Model::Model(const string &filename) : valid_(false) {
   //		seem to support vertex colors properly.
   //	- The reference .PLY reader leaks memory like a sieve,
   //	- Other libraries are complicated and weirdly designed. I just want to
-  //read
+  // read
   //		a model, damnit!
 
   // Try to open the source file.
@@ -101,7 +101,7 @@ Model::Model(const string &filename) : valid_(false) {
   valid_ = true;
 }
 
-bool Model::IsValid() { return valid_; }
+bool Model::IsValid() const { return valid_; }
 
 void Model::Render() {
   // Remember previous matrix settings.
@@ -153,11 +153,19 @@ Scene::Scene(QString filename) {
     if (it->compare("board", Qt::CaseInsensitive) == 0) {
       std::string board_path =
           RelativeTo(filename, config.value(*it, "").toString());
-      board_.readFromFile(config.value("board", "").toString().toStdString());
+      board_valid_ = false;
+      try {
+        board_.readFromFile(config.value("board", "").toString().toStdString());
+        board_valid_ = true;
+      }
+      catch (cv::Exception e) {
+        std::cout << e.what();
+      }
     } else if (it->compare("background", Qt::CaseInsensitive) == 0) {
       // Set background.
       std::string background_path =
           RelativeTo(filename, config.value(*it, "").toString());
+      background_ = QImage(background_path.c_str());
     } else if (it->startsWith("id", Qt::CaseInsensitive) && it->size() > 2) {
       // Get the id of the markers.
       QString idRaw = it->right(it->size() - 2);
@@ -206,3 +214,11 @@ void Scene::DrawModel(int id) {
     models_[id].Render();
   }
 }
+
+bool Scene::HasBoard() const { return board_valid_; }
+
+aruco::BoardConfiguration Scene::board() const { return board_; }
+
+bool Scene::HasBackground() const { return !background_.isNull(); }
+
+const QImage &Scene::background() const { return background_; }

@@ -1,9 +1,10 @@
 #ifndef __SCENE_H_
 #define __SCENE_H_
 
+#include <QFileInfo>
+#include <QImage>
 #include <QSettings>
 #include <QtOpenGL>
-#include <QFileInfo>
 
 #include <aruco/aruco.h>
 
@@ -45,19 +46,26 @@ class Model {
   Model();
   Model(const string &filename);
   void Render();
-  bool IsValid();
+  bool IsValid() const;
 };
 
 class Scene {
  protected:
   aruco::BoardConfiguration board_;
   std::unordered_map<int, Model> models_;
+  QImage background_;
+  bool board_valid_;
 
   std::string RelativeTo(QString scene_filename, QString filename);
 
  public:
   Scene(QString filename);
   void DrawModel(int id);
+
+  bool HasBoard() const;
+  aruco::BoardConfiguration board() const;
+  bool HasBackground() const;
+  const QImage &background() const;
 };
 
 #endif  // __SCENE_H_
