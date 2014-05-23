@@ -7,27 +7,25 @@ void SceneWidget::set_camera(const aruco::CameraParameters &camera) {
   camera_ = camera;
 }
 
-void SceneWidget::set_scene(std::shared_ptr<Scene> scene) {
-	scene_ = scene;
-}
+void SceneWidget::set_scene(std::shared_ptr<Scene> scene) { scene_ = scene; }
 
 void SceneWidget::initializeGL() {
   glClearColor(0, 0, 0, 0);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_SMOOTH);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_COLOR_MATERIAL);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+  glEnable(GL_COLOR_MATERIAL);
 
-	// Setup lighting.
-	GLfloat light_position[] = {1, 1, 0, 0};
-	GLfloat light_ambient[] = {0.2, 0.2, 0.2, 1};
-	GLfloat light_diffuse[] = {1, 1, 1, 1};
-	GLfloat light_specular[] = {1, 1, 1, 1};
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+  // Setup lighting.
+  GLfloat light_position[] = {1, 1, 0, 0};
+  GLfloat light_ambient[] = {0.2, 0.2, 0.2, 1};
+  GLfloat light_diffuse[] = {1, 1, 1, 1};
+  GLfloat light_specular[] = {1, 1, 1, 1};
+  glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+  glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
 }
 
 void SceneWidget::paintGL() {
@@ -60,9 +58,9 @@ void SceneWidget::paintGL() {
     glLoadMatrixd(modelview_matrix);
 
     // Draw this marker's model.
-		if (scene_) {
-			scene_->DrawModel(it->id);
-		}
+    if (scene_) {
+      scene_->DrawModel(it->id);
+    }
 
     glPopMatrix();
   }

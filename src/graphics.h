@@ -21,7 +21,7 @@ class SceneWidget : public QGLWidget {
 
   // Scene data.
   aruco::CameraParameters camera_;
-	std::shared_ptr<Scene> scene_;
+  std::shared_ptr<Scene> scene_;
 
   // Marker and object data.
   std::vector<aruco::Marker> markers_;
@@ -31,7 +31,7 @@ class SceneWidget : public QGLWidget {
 
   void set_markers(const std::vector<aruco::Marker> &markers);
   void set_camera(const aruco::CameraParameters &camera);
-	void set_scene(std::shared_ptr<Scene> scene);
+  void set_scene(std::shared_ptr<Scene> scene);
 };
 
 #endif  // __GRAPHICS_H_
