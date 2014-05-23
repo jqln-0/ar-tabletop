@@ -9,7 +9,6 @@ Building
 The following dependencies are required for building:
 
  - ArUco (and hence OpenCV)
- - AssImp
  - Boost (I think? Should probably double check that...)
  - GLUT
  - Qt5
