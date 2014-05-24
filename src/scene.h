@@ -51,8 +51,8 @@ class Model {
 
 class Scene {
  protected:
-   aruco::BoardConfiguration board_;
-   bool board_okay_;
+  aruco::BoardConfiguration board_;
+  bool board_okay_;
   std::unordered_map<int, Model> models_;
   QImage background_;
 
@@ -61,6 +61,7 @@ class Scene {
  public:
   Scene(QString filename);
   void DrawModel(int id);
+  void DrawBoard();
 
   bool HasBoard() const;
   aruco::BoardConfiguration board() const;

@@ -1,7 +1,7 @@
 #include "graphics.h"
 
 SceneWidget::SceneWidget(QWidget *parent)
-    : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {}
+    : QGLWidget(QGLFormat(QGL::SampleBuffers), parent), board_valid_(false) {}
 
 void SceneWidget::set_camera(const aruco::CameraParameters &camera) {
   camera_ = camera;
@@ -64,6 +64,23 @@ void SceneWidget::paintGL() {
 
     glPopMatrix();
   }
+
+  // Render the board if given.
+  if (board_valid_) {
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    qglColor(Qt::magenta);
+
+    // Set the board's model matrix.
+    double modelview_matrix[16];
+    board_.glGetModelViewMatrix(modelview_matrix);
+    glLoadMatrixd(modelview_matrix);
+
+    scene_->DrawBoard();
+
+    glPopMatrix();
+    board_valid_ = false;
+  }
 }
 
 void SceneWidget::resizeGL(int width, int height) {
@@ -78,4 +95,9 @@ void SceneWidget::resizeGL(int width, int height) {
 
 void SceneWidget::set_markers(const std::vector<aruco::Marker> &markers) {
   markers_ = markers;
+}
+
+void SceneWidget::set_board(const aruco::Board &board) {
+  board_ = board;
+  board_valid_ = true;
 }

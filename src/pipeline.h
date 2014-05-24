@@ -31,6 +31,9 @@ class Pipeline : public QObject {
   // Scene information.
   aruco::CameraParameters camera_;
   aruco::BoardConfiguration board_;
+  aruco::Board detected_;
+  bool board_okay_;
+  bool board_detected_;
 
   void DrawMarkers(cv::Mat dest) const;
 
@@ -44,6 +47,10 @@ class Pipeline : public QObject {
 
   void set_camera(const aruco::CameraParameters &c);
   void set_board(const aruco::BoardConfiguration &b);
+
+  aruco::Board detected() const;
+
+  bool HasBoard() const;
 
   const std::vector<aruco::Marker> &markers() const;
 

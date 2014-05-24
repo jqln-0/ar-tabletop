@@ -152,12 +152,14 @@ Scene::Scene(QString filename) : board_okay_(false) {
   for (auto it = keys.begin(); it != keys.end(); ++it) {
     if (it->compare("board", Qt::CaseInsensitive) == 0) {
       // Try to set the board.
-      std::string board_path = RelativeTo(filename, config.value(*it, "").toString());
+      std::string board_path =
+          RelativeTo(filename, config.value(*it, "").toString());
       board_okay_ = false;
       try {
         board_.readFromFile(board_path);
         board_okay_ = true;
-      } catch (cv::Exception e) {
+      }
+      catch (cv::Exception e) {
         std::cout << "Failed to load board: " << e.what() << "\n";
       }
     } else if (it->compare("background", Qt::CaseInsensitive) == 0) {
@@ -214,14 +216,22 @@ void Scene::DrawModel(int id) {
   }
 }
 
+void Scene::DrawBoard() {
+  glDisable(GL_LIGHTING);
+  glColor3f(0.5, 0, 0);
+  glBegin(GL_QUADS);
+  glVertex3f(5, -0.5, -5);
+  glVertex3f(5, -0.5, 5);
+  glVertex3f(-5, -0.5, 5);
+  glVertex3f(-5, -0.5, -5);
+  glEnd();
+  glEnable(GL_LIGHTING);
+}
+
 bool Scene::HasBackground() const { return !background_.isNull(); }
 
 const QImage &Scene::background() const { return background_; }
 
-bool Scene::HasBoard() const { 
-  return board_okay_;
-}
+bool Scene::HasBoard() const { return board_okay_; }
 
-aruco::BoardConfiguration Scene::board() const {
-  return board_;
-}
+aruco::BoardConfiguration Scene::board() const { return board_; }

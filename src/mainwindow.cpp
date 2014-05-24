@@ -66,6 +66,9 @@ void MainWindow::ProcessFrame() {
 
   // Inform the SceneWidget of the detected markers.
   scene_3d_->set_markers(processor_.markers());
+  if (processor_.HasBoard()) {
+    scene_3d_->set_board(processor_.detected());
+  }
 
   // Set the view and scene to the correct size.
   QSize frame_size(processor_.GetFrameSize().width,

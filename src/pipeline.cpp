@@ -6,7 +6,7 @@ using std::dynamic_pointer_cast;
 using std::shared_ptr;
 using std::vector;
 
-Pipeline::Pipeline() {
+Pipeline::Pipeline() : board_okay_(false), board_detected_(false) {
   filters_.push_back(
       std::make_shared<SmoothingMarkerFilter>(SmoothingMarkerFilter(3)));
 }
@@ -47,7 +47,12 @@ void Pipeline::set_camera(const aruco::CameraParameters &c) { camera_ = c; }
 
 void Pipeline::set_board(const aruco::BoardConfiguration &b) {
   board_ = b;
+  board_okay_ = true;
 }
+
+aruco::Board Pipeline::detected() const { return detected_; }
+
+bool Pipeline::HasBoard() const { return board_detected_; }
 
 QImage Pipeline::GetFrame(bool markers) const {
   // If markers are desired then we will need to draw them on a copy of the
@@ -111,6 +116,13 @@ void Pipeline::ProcessFrame() {
   }
 
   // Detect the given board if we have enough data.
-  if (camera_.isValid()) {
+  if (camera_.isValid() && board_okay_) {
+    board_detected_ = false;
+    float prob =
+        board_detector_.detect(markers_, board_, detected_,
+                               camera_.CameraMatrix, camera_.Distorsion, 1);
+    if (prob > 0.2) {
+      board_detected_ = true;
+    }
   }
 }
