@@ -51,6 +51,8 @@ class Model {
 
 class Scene {
  protected:
+   aruco::BoardConfiguration board_;
+   bool board_okay_;
   std::unordered_map<int, Model> models_;
   QImage background_;
 

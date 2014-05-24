@@ -24,6 +24,7 @@ class Pipeline : public QObject {
 
   // Marker detection.
   mutable aruco::MarkerDetector detector_;
+  aruco::BoardDetector board_detector_;
   std::vector<std::shared_ptr<MarkerFilter>> filters_;
   std::vector<aruco::Marker> markers_;
 

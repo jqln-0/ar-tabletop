@@ -45,7 +45,9 @@ const vector<Marker> &Pipeline::markers() const { return markers_; }
 
 void Pipeline::set_camera(const aruco::CameraParameters &c) { camera_ = c; }
 
-void Pipeline::set_board(const aruco::BoardConfiguration &b) { board_ = b; }
+void Pipeline::set_board(const aruco::BoardConfiguration &b) {
+  board_ = b;
+}
 
 QImage Pipeline::GetFrame(bool markers) const {
   // If markers are desired then we will need to draw them on a copy of the
@@ -102,12 +104,13 @@ void Pipeline::ProcessFrame() {
     frame_ = fetcher_->GetNextFrame();
   }
 
-  // Next run our detector and filters.
-  // TODO: Use camera, board, marker info.
+  // Next run our marker detector and filters.
   detector_.detect(frame_, markers_, camera_, 1.0);
   for (auto it = filters_.begin(); it != filters_.end(); ++it) {
     (*it)->Filter(&markers_);
   }
 
-  // TODO: 3D stuff?
+  // Detect the given board if we have enough data.
+  if (camera_.isValid()) {
+  }
 }

@@ -166,8 +166,12 @@ void MainWindow::OpenSceneFile() {
   // Load the given scene file.
   current_scene_ = make_shared<Scene>(dialog.selectedFiles()[0]);
 
-  // Inform the 3D scene renderer of the new scene.
+  // Inform the 3D scene renderer.
   scene_3d_->set_scene(current_scene_);
+
+  if (current_scene_->HasBoard()) {
+    processor_.set_board(current_scene_->board());
+  }
 }
 
 void MainWindow::OpenSourceFile() {

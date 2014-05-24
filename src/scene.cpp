@@ -145,12 +145,22 @@ void Model::Render() {
   glPopMatrix();
 }
 
-Scene::Scene(QString filename) {
+Scene::Scene(QString filename) : board_okay_(false) {
   QSettings config(filename, QSettings::IniFormat);
   QStringList keys = config.childKeys();
 
   for (auto it = keys.begin(); it != keys.end(); ++it) {
-    if (it->compare("background", Qt::CaseInsensitive) == 0) {
+    if (it->compare("board", Qt::CaseInsensitive) == 0) {
+      // Try to set the board.
+      std::string board_path = RelativeTo(filename, config.value(*it, "").toString());
+      board_okay_ = false;
+      try {
+        board_.readFromFile(board_path);
+        board_okay_ = true;
+      } catch (cv::Exception e) {
+        std::cout << "Failed to load board: " << e.what() << "\n";
+      }
+    } else if (it->compare("background", Qt::CaseInsensitive) == 0) {
       // Set background.
       std::string background_path =
           RelativeTo(filename, config.value(*it, "").toString());
@@ -207,3 +217,11 @@ void Scene::DrawModel(int id) {
 bool Scene::HasBackground() const { return !background_.isNull(); }
 
 const QImage &Scene::background() const { return background_; }
+
+bool Scene::HasBoard() const { 
+  return board_okay_;
+}
+
+aruco::BoardConfiguration Scene::board() const {
+  return board_;
+}
