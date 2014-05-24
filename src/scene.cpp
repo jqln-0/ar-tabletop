@@ -155,7 +155,7 @@ Scene::Scene(QString filename) {
           RelativeTo(filename, config.value(*it, "").toString());
       board_valid_ = false;
       try {
-        board_.readFromFile(config.value("board", "").toString().toStdString());
+        board_.readFromFile(board_path);
         board_valid_ = true;
       }
       catch (cv::Exception e) {
