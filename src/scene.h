@@ -51,10 +51,8 @@ class Model {
 
 class Scene {
  protected:
-  aruco::BoardConfiguration board_;
   std::unordered_map<int, Model> models_;
   QImage background_;
-  bool board_valid_;
 
   std::string RelativeTo(QString scene_filename, QString filename);
 

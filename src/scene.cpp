@@ -150,18 +150,7 @@ Scene::Scene(QString filename) {
   QStringList keys = config.childKeys();
 
   for (auto it = keys.begin(); it != keys.end(); ++it) {
-    if (it->compare("board", Qt::CaseInsensitive) == 0) {
-      std::string board_path =
-          RelativeTo(filename, config.value(*it, "").toString());
-      board_valid_ = false;
-      try {
-        board_.readFromFile(board_path);
-        board_valid_ = true;
-      }
-      catch (cv::Exception e) {
-        std::cout << e.what();
-      }
-    } else if (it->compare("background", Qt::CaseInsensitive) == 0) {
+    if (it->compare("background", Qt::CaseInsensitive) == 0) {
       // Set background.
       std::string background_path =
           RelativeTo(filename, config.value(*it, "").toString());
@@ -214,10 +203,6 @@ void Scene::DrawModel(int id) {
     models_[id].Render();
   }
 }
-
-bool Scene::HasBoard() const { return board_valid_; }
-
-aruco::BoardConfiguration Scene::board() const { return board_; }
 
 bool Scene::HasBackground() const { return !background_.isNull(); }
 
