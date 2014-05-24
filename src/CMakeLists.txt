@@ -1,11 +1,12 @@
 # Source files for the application.
 set( SOURCES
-	genboarddialog.cpp
+  boardwrap.cpp
   calibration.cpp
   denoising.cpp
   filter.cpp
   filterdialog.cpp
   framefetcher.cpp
+  genboarddialog.cpp
   genmarkerdialog.cpp
   graphics.cpp
   mainwindow.cpp
@@ -15,6 +16,7 @@ set( SOURCES
 
 # Header files for the application.
 set( HEADERS
+  boardwrap.h
   calibration.h
   denoising.h
   filter.h
