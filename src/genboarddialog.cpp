@@ -3,18 +3,21 @@
 
 #include <iostream>
 
-// TODO: Move these constants into some kind of configuration options.
+// TODO: Move these constants into some kind of configuration option.
 static const size_t kMarkerSize = 250;
 static const size_t kBoardWidth = 10;
 static const size_t kBoardHeight = 7;
 static const double kMarkerDistance = kMarkerSize * 0.2;
 
+// TODO: Sync this with the marker generator.
+static const int kMaxModelMarkerId = 100;
+
 GenerateBoardDialog::GenerateBoardDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::GenerateBoardDialog) {
   ui->setupUi(this);
-  // Generate the vector of disallowed ids.
-  // TODO: Move to a constant, sync with marker generator.
-  for (int id = 0; id < 100; ++id) {
+  // We don't want the space of board markers and model markers to ever overlap,
+  // so make sure we don't generate boards with markers in the model space.
+  for (int id = 0; id < kMaxModelMarkerId; ++id) {
     disallowed_ids_.push_back(id);
   }
 
@@ -26,43 +29,38 @@ GenerateBoardDialog::~GenerateBoardDialog() { delete ui; }
 
 void GenerateBoardDialog::Save() {
   // First save the board image.
-  QFileDialog img_dialog(this, "Save board image");
-  img_dialog.setDefaultSuffix("png");
-  img_dialog.setNameFilter("Image files (*.png *.jpg)");
-  img_dialog.setFileMode(QFileDialog::AnyFile);
-  img_dialog.setAcceptMode(QFileDialog::AcceptSave);
-  if (!img_dialog.exec()) {
+  QString image_filename = QFileDialog::getSaveFileName(
+      this, "Save board image.", "", "Image files (*.png *.jpg)");
+
+  if (image_filename == "") {
     return;
   }
 
   // Save the file.
   try {
-    cv::imwrite(img_dialog.selectedFiles()[0].toStdString(), board_image_);
+    cv::imwrite(image_filename.toStdString(), board_image_);
   }
   catch (cv::Exception e) {
-    QMessageBox msg(this);
-    msg.setText(
-        "Failed to write file! Ensure that the extension is correct "
-        "and that you have permission to write to this location.");
-    msg.exec();
+    qWarning() << e.what();
+    ShowMessage(this,
+                "Failed to write file! Ensure that the extension is correct"
+                " and that you have permission to write to this location.");
+    return;
   }
 
   // Next save the board configuration.
-  QFileDialog conf_dialog(this, "Save board configuration");
-  conf_dialog.setDefaultSuffix("board");
-  conf_dialog.setNameFilter("Board files (*.board)");
-  conf_dialog.setFileMode(QFileDialog::AnyFile);
-  conf_dialog.setAcceptMode(QFileDialog::AcceptSave);
-  if (!conf_dialog.exec()) {
+  QString board_filename = QFileDialog::getSaveFileName(
+      this, "Save board configuration.", "", "Board files (*.board)");
+
+  if (board_filename == "") {
     return;
   }
 
   // Save the file.
-  board_.saveToFile(conf_dialog.selectedFiles()[0].toStdString());
+  board_.saveToFile(board_filename.toStdString());
 }
 
 void GenerateBoardDialog::Generate(int type) {
-  // Generate the board.
   cv::Size gridSize(kBoardWidth, kBoardHeight);
   switch (type) {
     case 0:

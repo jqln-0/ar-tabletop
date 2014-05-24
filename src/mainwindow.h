@@ -11,6 +11,7 @@
 
 #include <memory>
 
+#include "boardwrap.h"
 #include "calibration.h"
 #include "denoising.h"
 #include "filterdialog.h"
@@ -19,6 +20,7 @@
 #include "genmarkerdialog.h"
 #include "graphics.h"
 #include "matconv.h"
+#include "message.h"
 #include "pipeline.h"
 #include "scene.h"
 
@@ -59,7 +61,7 @@ slots:
   std::shared_ptr<Scene> current_scene_;
 
   // We can't give the processor or 3D scene a camera until it's been resized to
-  // fit the frames, so we store it until that's been done.
+  // fit the frames, so we store it here until that's been done.
   bool camera_resized_;
   aruco::CameraParameters camera_;
 

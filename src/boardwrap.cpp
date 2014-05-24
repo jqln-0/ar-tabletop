@@ -1,5 +1,7 @@
 #include "boardwrap.h"
 
+using std::string;
+
 Board::Board() : config_valid_(false), board_valid_(false) {}
 Board::~Board() {}
 
@@ -21,17 +23,19 @@ aruco::Board Board::GetBoard() const {
   return board_;
 }
 
-void Board::LoadConfig(const QString &filename) {
-  LoadConfig(filename.toStdString());
+bool Board::LoadConfig(const QString &filename) {
+  return LoadConfig(filename.toStdString());
 }
 
-void Board::LoadConfig(const string &filename) {
+bool Board::LoadConfig(const string &filename) {
   try {
     config_.readFromFile(filename);
     config_valid_ = true;
+    return true;
   }
   catch (cv::Exception e) {
     qWarning() << "Failed to read board from" << filename.c_str() << e.what();
+    return false;
   }
 }
 

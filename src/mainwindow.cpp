@@ -42,8 +42,8 @@ void MainWindow::ProcessFrame() {
 
   if (!camera_resized_ && camera_.isValid()) {
     camera_.resize(processor_.GetFrameSize());
-    processor_.set_camera(camera_);
-    scene_3d_->set_camera(camera_);
+    processor_.SetCamera(camera_);
+    scene_3d_->SetCamera(camera_);
     camera_resized_ = true;
   }
 
@@ -53,8 +53,8 @@ void MainWindow::ProcessFrame() {
     backdrop = processor_.GetThresholdedFrame(show_markers_);
   } else if (show_markers_) {
     backdrop = processor_.GetFrame(show_markers_);
-  } else if (current_scene_ && current_scene_->HasBackground()) {
-    backdrop = current_scene_->background();
+  } else if (current_scene_ && !current_scene_->GetBackground().isNull()) {
+    backdrop = current_scene_->GetBackground();
   } else {
     backdrop = processor_.GetFrame(show_markers_);
   }
@@ -65,9 +65,11 @@ void MainWindow::ProcessFrame() {
   }
 
   // Inform the SceneWidget of the detected markers.
-  scene_3d_->set_markers(processor_.markers());
-  if (processor_.HasBoard()) {
-    scene_3d_->set_board(processor_.detected());
+  scene_3d_->SetMarkers(processor_.GetMarkers());
+
+  // If a board was detected, inform the scene.
+  if (processor_.GetBoard().HasBoard()) {
+    current_scene_->SetBoard(processor_.GetBoard());
   }
 
   // Set the view and scene to the correct size.
@@ -89,11 +91,9 @@ void MainWindow::ProcessFrame() {
 
 void MainWindow::OpenCalibrateDialog() {
   // We need to have a source of frames to pass to the calibrator.
-  shared_ptr<FrameFetcher> fetcher = processor_.fetcher();
+  shared_ptr<FrameFetcher> fetcher = processor_.GetFetcher();
   if (!fetcher) {
-    QMessageBox msg(this);
-    msg.setText("Select a source (webcam or file) before calibrating.");
-    msg.exec();
+    ShowMessage(this, "Select a source (webcam or file) before calibrating.");
     return;
   }
 
@@ -115,7 +115,7 @@ void MainWindow::OpenFilteringDialog() {
 
   shared_ptr<FrameFetcher> fetcher = dialog.MakeFilter();
   if (fetcher) {
-    processor_.set_fetcher(fetcher);
+    processor_.SetFetcher(fetcher);
   }
 }
 
@@ -133,56 +133,54 @@ void MainWindow::OpenGenerateMarkerDialog() {
 
 void MainWindow::OpenIntrinsicsFile() {
   // Get the user's file.
-  QFileDialog dialog(this, "Open camera file.");
-  dialog.setNameFilter("Camera files (*.camera)");
-  dialog.setFileMode(QFileDialog::ExistingFile);
-  if (!dialog.exec()) {
+  QString filename = QFileDialog::getOpenFileName(this, "Open camera file.", "",
+                                                  "Camera files (*.camera)");
+
+  if (filename == "") {
     return;
   }
 
   // Try to read camera parameters from the file.
   try {
-    camera_.readFromXMLFile(dialog.selectedFiles()[0].toStdString());
+    camera_.readFromXMLFile(filename.toStdString());
 
     // The new camera is likely the wrong size. Make sure we resize it before
     // use.
-    processor_.set_camera(aruco::CameraParameters());
-    scene_3d_->set_camera(aruco::CameraParameters());
+    processor_.SetCamera(aruco::CameraParameters());
+    scene_3d_->SetCamera(aruco::CameraParameters());
     camera_resized_ = false;
   }
   catch (cv::Exception e) {
-    QMessageBox msg(this);
-    msg.setText("Failed to read camera parameters from file.");
-    msg.exec();
+    ShowMessage(this, "Failed to read camera parameters from file.");
     return;
   }
 }
 
 void MainWindow::OpenSceneFile() {
-  QFileDialog dialog(this, "Open scene file.");
-  dialog.setNameFilter("Scene files (*.scene)");
-  dialog.setFileMode(QFileDialog::ExistingFile);
-  if (!dialog.exec()) {
+  QString filename = QFileDialog::getOpenFileName(this, "Open scene file.", "",
+                                                  "Scene files (*.scene)");
+
+  if (filename == "") {
     return;
   }
 
   // Load the given scene file.
-  current_scene_ = make_shared<Scene>(dialog.selectedFiles()[0]);
+  current_scene_ = make_shared<Scene>(filename);
 
   // Inform the 3D scene renderer.
-  scene_3d_->set_scene(current_scene_);
+  scene_3d_->SetScene(current_scene_);
 
-  if (current_scene_->HasBoard()) {
-    processor_.set_board(current_scene_->board());
+  if (current_scene_->GetBoard().HasConfig()) {
+    processor_.SetBoard(current_scene_->GetBoard());
   }
 }
 
 void MainWindow::OpenSourceFile() {
-  // Get the user's file.
-  QFileDialog dialog(this, "Open source file");
-  dialog.setNameFilter("Image files (*.png *.jpg);;Video files (*.avi)");
-  dialog.setFileMode(QFileDialog::ExistingFile);
-  if (!dialog.exec()) {
+  QString filename = QFileDialog::getOpenFileName(
+      this, "Open source file.", "",
+      "Image files (*.png *.jpg);;Video file (*.avi)");
+
+  if (filename == "") {
     return;
   }
 
@@ -190,25 +188,21 @@ void MainWindow::OpenSourceFile() {
   shared_ptr<FrameFetcher> fetcher;
 
   // Try the photo fetcher first.
-  fetcher =
-      make_shared<PhotoFrameFetcher>(dialog.selectedFiles()[0].toStdString());
+  fetcher = make_shared<PhotoFrameFetcher>(filename.toStdString());
 
   // Alternatively try the video fetcher.
   if (!fetcher->HasNextFrame()) {
-    fetcher =
-        make_shared<VideoFrameFetcher>(dialog.selectedFiles()[0].toStdString());
+    fetcher = make_shared<VideoFrameFetcher>(filename.toStdString());
   }
 
   // Check if the fetcher is valid.
   if (!fetcher->HasNextFrame()) {
-    QMessageBox msg(this);
-    msg.setText("Failed to read file! The format may be incorrect.");
-    msg.exec();
+    ShowMessage(this, "Failed to read file! The format may be incorrect.");
     return;
   }
 
   // Assign the fetcher.
-  processor_.set_fetcher(fetcher);
+  processor_.SetFetcher(fetcher);
 }
 
 void MainWindow::OpenSourceWebcam() {
@@ -217,17 +211,16 @@ void MainWindow::OpenSourceWebcam() {
 
   // See if we can get frames from it.
   if (!fetcher->HasNextFrame()) {
-    QMessageBox msg(this);
-    msg.setText("Error: Could not open webcam for reading.");
-    msg.exec();
+    ShowMessage(this, "Error: Could not open webcam for reading.");
     return;
   }
 
   // Assign the fetcher to the pipeline.
-  processor_.set_fetcher(fetcher);
+  processor_.SetFetcher(fetcher);
 }
 
 void MainWindow::OpenThresholdDialog() {
+  // TODO.
   std::cout << "Open threshold dialog.\n";
 }
 

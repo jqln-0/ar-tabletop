@@ -5,7 +5,7 @@
 #include <QFileDialog>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsView>
-#include <QMessageBox>
+#include <QtDebug>
 
 #include <aruco/aruco.h>
 #include <aruco/arucofidmarkers.h>
@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "matconv.h"
+#include "message.h"
 
 namespace Ui {
 class GenerateBoardDialog;
@@ -33,9 +34,16 @@ slots:
 
  private:
   Ui::GenerateBoardDialog *ui;
-  cv::Mat board_image_;
+
+  // We don't need a wrapper here since we expect boards we generate will always
+  // be valid.
   aruco::BoardConfiguration board_;
+  cv::Mat board_image_;
+
+  // Scene to display generated board images.
   QGraphicsScene scene_;
+
+  // Marker ids which boards are forbidden from using.
   std::vector<int> disallowed_ids_;
 };
 

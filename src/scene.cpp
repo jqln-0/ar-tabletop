@@ -13,8 +13,7 @@ Model::Model(const string &filename) : valid_(false) {
   //		seem to support vertex colors properly.
   //	- The reference .PLY reader leaks memory like a sieve,
   //	- Other libraries are complicated and weirdly designed. I just want to
-  // read
-  //		a model, damnit!
+  //		read a model, damnit!
 
   // Try to open the source file.
   ifstream f;
@@ -145,30 +144,24 @@ void Model::Render() {
   glPopMatrix();
 }
 
-Scene::Scene(QString filename) : board_okay_(false) {
+Scene::Scene(const QString &filename) {
+  // Open the config file and get the keys from it.
   QSettings config(filename, QSettings::IniFormat);
   QStringList keys = config.childKeys();
 
   for (auto it = keys.begin(); it != keys.end(); ++it) {
     if (it->compare("board", Qt::CaseInsensitive) == 0) {
-      // Try to set the board.
+      // Read and set the scene's board.
       std::string board_path =
           RelativeTo(filename, config.value(*it, "").toString());
-      board_okay_ = false;
-      try {
-        board_.readFromFile(board_path);
-        board_okay_ = true;
-      }
-      catch (cv::Exception e) {
-        std::cout << "Failed to load board: " << e.what() << "\n";
-      }
+      board_.LoadConfig(board_path);
     } else if (it->compare("background", Qt::CaseInsensitive) == 0) {
-      // Set background.
+      // Load the scene's background image.
       std::string background_path =
           RelativeTo(filename, config.value(*it, "").toString());
       background_ = QImage(background_path.c_str());
     } else if (it->startsWith("id", Qt::CaseInsensitive) && it->size() > 2) {
-      // Get the id of the markers.
+      // Get the id of the marker we're specifying.
       QString idRaw = it->right(it->size() - 2);
       bool success;
       int id = idRaw.toInt(&success, 10);
@@ -204,7 +197,8 @@ Scene::Scene(QString filename) : board_okay_(false) {
   }
 }
 
-std::string Scene::RelativeTo(QString scene_filename, QString filename) {
+std::string Scene::RelativeTo(const QString &scene_filename,
+                              const QString &filename) const {
   QFileInfo info(scene_filename);
   QString path = info.dir().path() + QDir::separator() + filename;
   return path.toStdString();
@@ -217,6 +211,7 @@ void Scene::DrawModel(int id) {
 }
 
 void Scene::DrawBoard() {
+  // TODO.
   glDisable(GL_LIGHTING);
   glColor3f(0.5, 0, 0);
   glBegin(GL_QUADS);
@@ -228,10 +223,10 @@ void Scene::DrawBoard() {
   glEnable(GL_LIGHTING);
 }
 
-bool Scene::HasBackground() const { return !background_.isNull(); }
+Board Scene::GetBoard() const { return board_; }
 
-const QImage &Scene::background() const { return background_; }
+void Scene::SetBoard(Board board) { board_ = board; }
 
-bool Scene::HasBoard() const { return board_okay_; }
+const QImage &Scene::GetBackground() const { return background_; }
 
-aruco::BoardConfiguration Scene::board() const { return board_; }
+const QImage &Scene::GetBoardImage() const { return board_image_; }

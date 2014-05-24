@@ -1,13 +1,17 @@
 #include "graphics.h"
 
 SceneWidget::SceneWidget(QWidget *parent)
-    : QGLWidget(QGLFormat(QGL::SampleBuffers), parent), board_valid_(false) {}
+    : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {}
 
-void SceneWidget::set_camera(const aruco::CameraParameters &camera) {
+void SceneWidget::SetCamera(const aruco::CameraParameters &camera) {
   camera_ = camera;
 }
 
-void SceneWidget::set_scene(std::shared_ptr<Scene> scene) { scene_ = scene; }
+void SceneWidget::SetScene(std::shared_ptr<Scene> scene) { scene_ = scene; }
+
+void SceneWidget::SetMarkers(const std::vector<aruco::Marker> &markers) {
+  markers_ = markers;
+}
 
 void SceneWidget::initializeGL() {
   glClearColor(0, 0, 0, 0);
@@ -31,7 +35,7 @@ void SceneWidget::initializeGL() {
 void SceneWidget::paintGL() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // Abort painting if the camera is invalid.
+  // Only try to render the scene if we have a valid camera to use.
   if (!camera_.isValid()) {
     return;
   }
@@ -66,20 +70,19 @@ void SceneWidget::paintGL() {
   }
 
   // Render the board if given.
-  if (board_valid_) {
+  if (scene_->GetBoard().HasBoard()) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     qglColor(Qt::magenta);
 
     // Set the board's model matrix.
     double modelview_matrix[16];
-    board_.glGetModelViewMatrix(modelview_matrix);
+    scene_->GetBoard().GetBoard().glGetModelViewMatrix(modelview_matrix);
     glLoadMatrixd(modelview_matrix);
 
     scene_->DrawBoard();
 
     glPopMatrix();
-    board_valid_ = false;
   }
 }
 
@@ -91,13 +94,4 @@ void SceneWidget::resizeGL(int width, int height) {
   glLoadIdentity();
   glOrtho(0, this->width(), 0, this->height(), -1.0, 1.0);
   glViewport(0, 0, this->width(), this->height());
-}
-
-void SceneWidget::set_markers(const std::vector<aruco::Marker> &markers) {
-  markers_ = markers;
-}
-
-void SceneWidget::set_board(const aruco::Board &board) {
-  board_ = board;
-  board_valid_ = true;
 }

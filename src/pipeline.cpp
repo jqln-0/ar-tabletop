@@ -6,16 +6,16 @@ using std::dynamic_pointer_cast;
 using std::shared_ptr;
 using std::vector;
 
-Pipeline::Pipeline() : board_okay_(false), board_detected_(false) {
+Pipeline::Pipeline() {
   filters_.push_back(
       std::make_shared<SmoothingMarkerFilter>(SmoothingMarkerFilter(3)));
 }
 
 Pipeline::~Pipeline() {}
 
-shared_ptr<FrameFetcher> Pipeline::fetcher() const { return fetcher_; }
+shared_ptr<FrameFetcher> Pipeline::GetFetcher() const { return fetcher_; }
 
-void Pipeline::set_fetcher(shared_ptr<FrameFetcher> f) {
+void Pipeline::SetFetcher(shared_ptr<FrameFetcher> f) {
   // Check if either the current fetcher or the given fetcher is really a
   // DenoisingFrameFetcher;
   auto f_cast = dynamic_pointer_cast<DenoisingFrameFetcher>(f);
@@ -41,18 +41,13 @@ void Pipeline::set_fetcher(shared_ptr<FrameFetcher> f) {
   }
 }
 
-const vector<Marker> &Pipeline::markers() const { return markers_; }
+const vector<Marker> &Pipeline::GetMarkers() const { return markers_; }
 
-void Pipeline::set_camera(const aruco::CameraParameters &c) { camera_ = c; }
+void Pipeline::SetCamera(const aruco::CameraParameters &c) { camera_ = c; }
 
-void Pipeline::set_board(const aruco::BoardConfiguration &b) {
-  board_ = b;
-  board_okay_ = true;
-}
+void Pipeline::SetBoard(const Board &b) { board_ = b; }
 
-aruco::Board Pipeline::detected() const { return detected_; }
-
-bool Pipeline::HasBoard() const { return board_detected_; }
+Board Pipeline::GetBoard() const { return board_; }
 
 QImage Pipeline::GetFrame(bool markers) const {
   // If markers are desired then we will need to draw them on a copy of the
@@ -116,13 +111,10 @@ void Pipeline::ProcessFrame() {
   }
 
   // Detect the given board if we have enough data.
-  if (camera_.isValid() && board_okay_) {
-    board_detected_ = false;
-    float prob =
-        board_detector_.detect(markers_, board_, detected_,
-                               camera_.CameraMatrix, camera_.Distorsion, 1);
-    if (prob > 0.2) {
-      board_detected_ = true;
-    }
+  if (camera_.isValid() && board_.HasConfig()) {
+    aruco::Board detected_board;
+    board_detector_.detect(markers_, board_.GetConfig(), detected_board,
+                           camera_.CameraMatrix, camera_.Distorsion, 1);
+    board_.SetBoard(detected_board);
   }
 }

@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 
+#include "boardwrap.h"
 #include "denoising.h"
 #include "framefetcher.h"
 #include "filter.h"
@@ -30,10 +31,7 @@ class Pipeline : public QObject {
 
   // Scene information.
   aruco::CameraParameters camera_;
-  aruco::BoardConfiguration board_;
-  aruco::Board detected_;
-  bool board_okay_;
-  bool board_detected_;
+  Board board_;
 
   void DrawMarkers(cv::Mat dest) const;
 
@@ -41,27 +39,24 @@ class Pipeline : public QObject {
   Pipeline();
   virtual ~Pipeline();
 
-  std::shared_ptr<FrameFetcher> fetcher() const;
-  void set_fetcher(std::shared_ptr<FrameFetcher> f);
-  void set_fetcher(std::shared_ptr<DenoisingFrameFetcher> f);
+  std::shared_ptr<FrameFetcher> GetFetcher() const;
+  void SetFetcher(std::shared_ptr<FrameFetcher> f);
+  void SetFetcher(std::shared_ptr<DenoisingFrameFetcher> f);
 
-  void set_camera(const aruco::CameraParameters &c);
-  void set_board(const aruco::BoardConfiguration &b);
+  void SetCamera(const aruco::CameraParameters &c);
+  void SetBoard(const Board &b);
 
-  aruco::Board detected() const;
-
-  bool HasBoard() const;
-
-  const std::vector<aruco::Marker> &markers() const;
+  const std::vector<aruco::Marker> &GetMarkers() const;
 
   QImage GetFrame(bool markers = false) const;
   QImage GetThresholdedFrame(bool markers = false) const;
+
+  Board GetBoard() const;
 
   cv::Size GetFrameSize() const;
 
   bool IsReady() const;
 
-  // ProcessFrame fetches a frame and performs marker detection on it.
   void ProcessFrame();
 };
 

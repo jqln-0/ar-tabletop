@@ -10,6 +10,7 @@ set( SOURCES
   genmarkerdialog.cpp
   graphics.cpp
   mainwindow.cpp
+  message.cpp
   pipeline.cpp
   scene.cpp
 )
@@ -27,6 +28,7 @@ set( HEADERS
   graphics.h
   mainwindow.h
   matconv.h
+  message.h
   pipeline.h
   scene.h
 )

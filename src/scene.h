@@ -14,6 +14,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "boardwrap.h"
+
 enum PLYState {
   kInitial,
   kHeader,
@@ -23,11 +25,11 @@ enum PLYState {
 
 class Vertex {
  public:
-  // Vertex position.
+  // Vertex positions.
   float x, y, z;
-  // Normal direction.
+  // Normal directions.
   float nx, ny, nz;
-  // Color.
+  // Color components.
   float r, g, b;
 };
 
@@ -38,7 +40,10 @@ class Face {
 
 class Model {
  protected:
+  // Specifies whether or not this model is valid, ie. whether or not the model
+  // loading worked.
   bool valid_;
+
   std::vector<Vertex> vertices_;
   std::vector<Face> faces_;
 
@@ -51,22 +56,29 @@ class Model {
 
 class Scene {
  protected:
-  aruco::BoardConfiguration board_;
-  bool board_okay_;
+  Board board_;
   std::unordered_map<int, Model> models_;
+
+  // Background image for each frame.
   QImage background_;
 
-  std::string RelativeTo(QString scene_filename, QString filename);
+  // Image to display on the scene's board.
+  QImage board_image_;
+
+  // Manipulates 'filename' to be a path relative to the parent directory of
+  // 'scene_filename'.
+  std::string RelativeTo(const QString &scene_filename,
+                         const QString &filename) const;
 
  public:
-  Scene(QString filename);
+  Scene(const QString &filename);
   void DrawModel(int id);
   void DrawBoard();
 
-  bool HasBoard() const;
-  aruco::BoardConfiguration board() const;
-  bool HasBackground() const;
-  const QImage &background() const;
+  Board GetBoard() const;
+  void SetBoard(Board board);
+  const QImage &GetBackground() const;
+  const QImage &GetBoardImage() const;
 };
 
 #endif  // __SCENE_H_

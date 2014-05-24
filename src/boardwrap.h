@@ -6,6 +6,8 @@
 
 #include <aruco/aruco.h>
 
+#include <string>
+
 // ArUco doesn't provide any capability to check the validity of a board or
 // board configuration. This class therefore wraps these classes to provide
 // such functionality.
@@ -27,8 +29,11 @@ class Board {
   aruco::BoardConfiguration GetConfig() const;
   aruco::Board GetBoard() const;
 
-  void LoadConfig(const string &filename);
-  void LoadConfig(const QString &filename);
+  // Attempts to read the board configuration from the given filename. Returns
+  // true on success.
+  bool LoadConfig(const std::string &filename);
+  bool LoadConfig(const QString &filename);
+
   void SetConfig(const aruco::BoardConfiguration &config);
   void SetBoard(const aruco::Board &board);
 };

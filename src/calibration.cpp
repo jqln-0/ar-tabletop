@@ -10,8 +10,7 @@ CalibrateDialog::CalibrateDialog(shared_ptr<FrameFetcher> source,
       ui(new Ui::CalibrateDialog),
       source_(source),
       min_viewpoint_distance_(0.05),
-      capturing_(false),
-      board_okay_(false) {
+      capturing_(false) {
   ui->setupUi(this);
 
   // Set up the graphics view.
@@ -19,7 +18,7 @@ CalibrateDialog::CalibrateDialog(shared_ptr<FrameFetcher> source,
   view->setScene(&scene_);
   view->show();
 
-  // Begin the timer.
+  // Begin the frame capture timer.
   timer_ = new QTimer(this);
   connect(timer_, SIGNAL(timeout()), this, SLOT(ProcessFrame()));
   timer_->start(100);
@@ -35,7 +34,7 @@ CalibrateDialog::~CalibrateDialog() {
 }
 
 void CalibrateDialog::ProcessFrame() {
-  // Make sure there are frames for us to fetch.
+  // Make sure there is a frame for us to fetch.
   if (!source_->HasNextFrame()) {
     return;
   }
@@ -43,12 +42,12 @@ void CalibrateDialog::ProcessFrame() {
   // Get the frame.
   cv::Mat frame = source_->GetNextFrame();
 
-  // Perform the calibrations if requested.
-  if (capturing_ && board_okay_) {
+  // Perform the calibration if we need to.
+  if (capturing_) {
     CalibrationFrame(frame);
   }
 
-  // Resize the view to fit the frame.
+  // Resize the view to fit the captured frame.
   auto view = this->findChild<QGraphicsView *>("graphicsView");
   view->setFixedSize(frame.size().width, frame.size().height);
 
@@ -58,102 +57,92 @@ void CalibrateDialog::ProcessFrame() {
 }
 
 void CalibrateDialog::OpenBoardDialog() {
-  // Get the board file.
-  QFileDialog dialog(this, "Open board file.");
-  dialog.setNameFilter("Board files (*.board)");
-  dialog.setFileMode(QFileDialog::ExistingFile);
-  if (!dialog.exec()) {
+  // Get the board filename.
+  QString filename = QFileDialog::getOpenFileName(this, "Open board file.", "",
+                                                  "Board files (*.board)");
+
+  // Check if the user hit cancel.
+  if (filename == "") {
     return;
   }
 
-  try {
-    board_.readFromFile(dialog.selectedFiles()[0].toStdString());
-  }
-  catch (cv::Exception e) {
-    QMessageBox msg(this);
-    msg.setText("Error reading from board file.");
-    msg.exec();
+  // Try to load the configuration from the given file.
+  if (!board_.LoadConfig(filename)) {
+    ShowMessage(this, "Error reading from board file.");
     return;
   }
 
-  board_okay_ = true;
-  detector_.setParams(board_);
+  // Set the board the detector is using.
+  detector_.setParams(board_.GetConfig());
 }
 
 void CalibrateDialog::OpenSaveDialog() {
   // Make sure we have enough viewpoints to calibrate.
-  if (this->findChild<QLCDNumber *>("viewpointCount")->intValue() < 3) {
-    QMessageBox msg(this);
-    msg.setText("Need >= 3 viewpoints before saving.");
-    msg.exec();
+  auto counter = this->findChild<QLCDNumber *>("viewpointCount");
+  if (counter->intValue() < 3) {
+    ShowMessage(this, "Need to capture at least 3 viewpoints before saving.");
     return;
   }
 
-  // Get the board file.
-  QFileDialog dialog(this, "Save camera file.");
-  dialog.setDefaultSuffix("camera");
-  dialog.setNameFilter("Camera files (*.camera)");
-  dialog.setFileMode(QFileDialog::AnyFile);
-  dialog.setAcceptMode(QFileDialog::AcceptSave);
-  if (!dialog.exec()) {
+  // Prompt the user for a destination filename.
+  QString filename = QFileDialog::getSaveFileName(this, "Save camera file.", "",
+                                                  "Camera files (*.camera)");
+
+  // Check for user cancelling.
+  if (filename == "") {
     return;
   }
 
-  // Perform final calibration.
+  // Perform the final calibration.
   try {
-    QProgressDialog progress(this);
-    progress.setLabelText("Performing final calibration.");
-    progress.setMinimum(0);
-    progress.setMaximum(0);
-    progress.open();
+    // TODO: Consider doing this twice and removing outliar points.
     cv::calibrateCamera(object_points_, image_points_, camera_.CamSize,
                         camera_.CameraMatrix, camera_.Distorsion, r_vectors_,
                         t_vectors_);
-    progress.close();
   }
   catch (cv::Exception e) {
-    QMessageBox msg(this);
-    msg.setText("Final calibration failed.");
-    msg.exec();
-  }
-
-  // Save the file.
-  camera_.saveToFile(dialog.selectedFiles()[0].toStdString(), true);
-}
-
-void CalibrateDialog::ToggleCapture(bool state) {
-  // Capturing can only begin once we have a board to look for.
-  if (!board_okay_ && state) {
-    this->findChild<QPushButton *>("capture")->setChecked(false);
-    QMessageBox msg(this);
-    msg.setText("Load a board before capturing.");
-    msg.exec();
+    qWarning() << e.what();
+    ShowMessage(this, "Final calibration failed.");
     return;
   }
 
-  // Make sure the board is in the correct scale.
-  if (!board_.isExpressedInMeters()) {
-    ConvertBoard();
-    detector_.setParams(board_);
-  }
+  // Save the file.
+  camera_.saveToFile(filename.toStdString(), true);
+}
 
-  capturing_ = state;
+void CalibrateDialog::ToggleCapture(bool state) {
+  if (state) {
+    // User is trying to begin calibration.
 
-  // Make sure the user can't alter options whilst capturing.
-  if (capturing_) {
-    this->findChild<QSpinBox *>("markerSize")->setDisabled(true);
-    this->findChild<QPushButton *>("loadBoard")->setDisabled(true);
+    // Calibration can only begin once we have a board config to look for.
+    if (!board_.HasConfig()) {
+      ShowMessage(this, "Load a board before beginning calibration.");
+      return;
+    }
 
-    // Reset the calibration information.
+    // Ensure the board is in the correct scale. We do this here rather than on
+    // load so that the user can set the marker size after loading a board.
+    if (!board_.GetConfig().isExpressedInMeters()) {
+      ConvertBoard();
+    }
+
+    // Every seems good; calibration can now start!
+    capturing_ = true;
+
+    // Reset calibration data from previous runs.
     this->findChild<QLCDNumber *>("viewpointCount")->display(0);
     image_points_.clear();
     object_points_.clear();
     r_vectors_.clear();
     t_vectors_.clear();
   } else {
-    this->findChild<QSpinBox *>("markerSize")->setDisabled(false);
-    this->findChild<QPushButton *>("loadBoard")->setDisabled(false);
+    // User is trying to end calibration.
+    capturing_ = false;
   }
+
+  // Make sure the user can't edit options whilst capturing.
+  this->findChild<QSpinBox *>("markerSize")->setDisabled(capturing_);
+  this->findChild<QPushButton *>("loadBoard")->setDisabled(capturing_);
 }
 
 void CalibrateDialog::CalibrationFrame(cv::Mat &f) {
@@ -174,7 +163,7 @@ void CalibrateDialog::CalibrationFrame(cv::Mat &f) {
   }
 }
 
-aruco::CameraParameters CalibrateDialog::GuessCamera(cv::Size s) {
+aruco::CameraParameters CalibrateDialog::GuessCamera(const cv::Size &s) {
   aruco::CameraParameters camera;
   cv::Mat camera_matrix = cv::Mat::eye(3, 3, CV_32F);
   camera_matrix.at<float>(0, 0) = 500;
@@ -185,7 +174,7 @@ aruco::CameraParameters CalibrateDialog::GuessCamera(cv::Size s) {
   return camera;
 }
 
-float CalibrateDialog::GetMinimumDistanceToStoredT(cv::Mat t) {
+float CalibrateDialog::GetMinimumDistanceToStoredT(const cv::Mat &t) {
   float lowest = std::numeric_limits<float>::max();
   for (auto it = t_vectors_.begin(); it != t_vectors_.end(); ++it) {
     float normalised = cv::norm(t - *it);
@@ -230,7 +219,7 @@ void CalibrateDialog::SetViewpoint(vector<cv::Point3f> &obj_points,
                       t_vectors_);
 }
 
-void CalibrateDialog::GetPoints(aruco::Board &b,
+void CalibrateDialog::GetPoints(const aruco::Board &b,
                                 std::vector<cv::Point3f> *obj_points,
                                 std::vector<cv::Point2f> *img_points) {
   int num_points = b.size() * 4;
@@ -247,20 +236,29 @@ void CalibrateDialog::GetPoints(aruco::Board &b,
 
 double CalibrateDialog::GetMarkerSize() {
   QSpinBox *b = this->findChild<QSpinBox *>("markerSize");
+  // Convert marker size from millimetres to metres.
   return double(b->value()) / 1000.0;
 }
 
 void CalibrateDialog::ConvertBoard() {
+  if (!board_.HasConfig()) {
+    return;
+  }
+  aruco::BoardConfiguration config = board_.GetConfig();
+
   // First get the size of each marker in pixels and determine a scaling
   // factor.
-  double marker_size_pixels = cv::norm(board_[0][0] - board_[0][1]);
+  double marker_size_pixels = cv::norm(config[0][0] - config[0][1]);
   double pixel_size = GetMarkerSize() / marker_size_pixels;
 
   // Now change the board size flag and the size of each marker.
-  board_.mInfoType = aruco::BoardConfiguration::METERS;
-  for (size_t i = 0; i < board_.size(); ++i) {
+  config.mInfoType = aruco::BoardConfiguration::METERS;
+  for (size_t i = 0; i < config.size(); ++i) {
     for (int j = 0; j < 4; ++j) {
-      board_[i][j] *= pixel_size;
+      config[i][j] *= pixel_size;
     }
   }
+
+  board_.SetConfig(config);
+  detector_.setParams(config);
 }
