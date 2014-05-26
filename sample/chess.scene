@@ -1,4 +1,5 @@
 board = boards/chess.board
+bimage = textures/chess.jpg
 id29 = models/white_king.ply
 id39 = models/white_rook.ply
 id49 = models/white_knight.ply
