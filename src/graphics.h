@@ -26,6 +26,9 @@ class SceneWidget : public QGLWidget {
   // Scene to use for drawing models.
   std::shared_ptr<Scene> scene_;
 
+  // The scene's board texture in OpenGL format.
+  GLuint texture_;
+
   // The markers detected during the last frame.
   std::vector<aruco::Marker> markers_;
 

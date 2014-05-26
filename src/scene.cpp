@@ -155,6 +155,12 @@ Scene::Scene(const QString &filename) {
       std::string board_path =
           RelativeTo(filename, config.value(*it, "").toString());
       board_.LoadConfig(board_path);
+    } else if (it->compare("bimage", Qt::CaseInsensitive) == 0) {
+      // Read and set the scene's board image.
+      // TODO: Make sure the image is always a power of 2.
+      std::string image_path =
+          RelativeTo(filename, config.value(*it, "").toString());
+      board_image_ = QImage(image_path.c_str());
     } else if (it->compare("background", Qt::CaseInsensitive) == 0) {
       // Load the scene's background image.
       std::string background_path =
@@ -211,15 +217,19 @@ void Scene::DrawModel(int id) {
 }
 
 void Scene::DrawBoard() {
-  // TODO.
   glDisable(GL_LIGHTING);
-  glColor3f(0.5, 0, 0);
+
   glBegin(GL_QUADS);
+  glTexCoord2i(1, 0);
   glVertex3f(5, -0.5, -5);
+  glTexCoord2i(1, 1);
   glVertex3f(5, -0.5, 5);
+  glTexCoord2i(0, 1);
   glVertex3f(-5, -0.5, 5);
+  glTexCoord2i(0, 0);
   glVertex3f(-5, -0.5, -5);
   glEnd();
+
   glEnable(GL_LIGHTING);
 }
 

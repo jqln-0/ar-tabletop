@@ -30,6 +30,29 @@ void SceneWidget::initializeGL() {
   glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
   glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+
+  // Setup the board texture if needed.
+  if (scene_ && !scene_->GetBoardImage().isNull()) {
+    glEnable(GL_TEXTURE_2D);
+
+    // Create the texture and set filtering parameters.
+    glGenTextures(1, &texture_);
+    glBindTexture(GL_TEXTURE_2D, texture_);
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    // Load the texture data.
+    QImage image = QGLWidget::convertToGLFormat(scene_->GetBoardImage());
+    glBindTexture(GL_TEXTURE_2D, texture_);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width(), image.height(), 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+
+    glDisable(GL_TEXTURE_2D);
+  }
 }
 
 void SceneWidget::paintGL() {
@@ -70,17 +93,26 @@ void SceneWidget::paintGL() {
   }
 
   // Render the board if given.
-  if (scene_->GetBoard().HasBoard()) {
+  if (scene_ && scene_->GetBoard().HasBoard()) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    qglColor(Qt::magenta);
 
     // Set the board's model matrix.
     double modelview_matrix[16];
     scene_->GetBoard().GetBoard().glGetModelViewMatrix(modelview_matrix);
     glLoadMatrixd(modelview_matrix);
 
-    scene_->DrawBoard();
+    // Draw the board.
+    QImage image = QGLWidget::convertToGLFormat(scene_->GetBoardImage());
+    if (!image.isNull()) {
+      glColor3f(1, 1, 1);
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D, texture_);
+      glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, image.width(), image.height(),
+                      GL_RGBA, GL_UNSIGNED_BYTE, image.bits());
+      scene_->DrawBoard();
+      glDisable(GL_TEXTURE_2D);
+    }
 
     glPopMatrix();
   }
